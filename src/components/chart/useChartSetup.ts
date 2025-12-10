@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useTheme } from 'next-themes';
 import {
   createChart,
@@ -59,16 +59,19 @@ export function useChartSetup(
   const [isReady, setIsReady] = useState(false);
   const { resolvedTheme } = useTheme();
 
-  // Get current theme colors
-  const colors = chartThemes[resolvedTheme === 'dark' ? 'dark' : 'light'];
+  // Memoize theme to avoid recreating chart on every render
+  const theme = resolvedTheme === 'dark' ? 'dark' : 'light';
+  const colors = useMemo(() => chartThemes[theme], [theme]);
 
+  // Create chart only once when container is available
   useEffect(() => {
     if (!containerRef.current) return;
 
     const container = containerRef.current;
+    
     const chart = createChart(container, {
-      width: options.width || container.clientWidth,
-      height: options.height || container.clientHeight,
+      width: options.width || container.clientWidth || 800,
+      height: options.height || container.clientHeight || 400,
       layout: {
         background: { type: ColorType.Solid, color: colors.background },
         textColor: colors.text,
@@ -157,7 +160,38 @@ export function useChartSetup(
       candleSeriesRef.current = null;
       setIsReady(false);
     };
-  }, [containerRef, options.width, options.height, resolvedTheme, colors]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [containerRef, options.width, options.height]);
+
+  // Update chart colors when theme changes
+  useEffect(() => {
+    if (!chartRef.current || !candleSeriesRef.current) return;
+
+    chartRef.current.applyOptions({
+      layout: {
+        background: { type: ColorType.Solid, color: colors.background },
+        textColor: colors.text,
+      },
+      grid: {
+        vertLines: { color: colors.grid },
+        horzLines: { color: colors.grid },
+      },
+      rightPriceScale: {
+        borderColor: colors.border,
+        textColor: colors.text,
+      },
+      timeScale: {
+        borderColor: colors.border,
+      },
+    });
+
+    candleSeriesRef.current.applyOptions({
+      upColor: colors.upColor,
+      downColor: colors.downColor,
+      wickUpColor: colors.upColor,
+      wickDownColor: colors.downColor,
+    });
+  }, [colors]);
 
   const updateCandles = useCallback((candles: Candle[]) => {
     if (!candleSeriesRef.current || !isReady) return;
@@ -171,6 +205,11 @@ export function useChartSetup(
     }));
 
     candleSeriesRef.current.setData(chartData);
+    
+    // Fit content to view
+    if (chartRef.current) {
+      chartRef.current.timeScale().fitContent();
+    }
   }, [isReady]);
 
   const clearChart = useCallback(() => {

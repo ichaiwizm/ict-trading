@@ -24,7 +24,7 @@ interface MarketState {
 
 export const useMarketStore = create<MarketState>((set, get) => ({
   symbol: 'EURUSD',
-  timeframe: '15m',
+  timeframe: '1D',
   candles: {},
   currentPrice: 0,
   bid: 0,

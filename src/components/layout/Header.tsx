@@ -7,10 +7,15 @@ import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export function Header() {
-  const { symbol, bid, ask } = useMarketStore();
   const [mounted, setMounted] = useState(false);
   const [isKillZoneActive, setIsKillZoneActive] = useState(false);
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
+  
+  // Access store only after mount to prevent hydration mismatch
+  const storeData = useMarketStore();
+  const symbol = mounted ? storeData.symbol : 'EURUSD';
+  const bid = mounted ? storeData.bid : 0;
+  const ask = mounted ? storeData.ask : 0;
 
   useEffect(() => {
     setMounted(true);

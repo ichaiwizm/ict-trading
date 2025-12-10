@@ -66,8 +66,8 @@ class MarketDataProvider {
 
     // Only daily timeframe is available for free on Alpha Vantage
     if (timeframe !== '1D') {
-      console.warn(`[DataProvider] Timeframe ${timeframe} not available (Alpha Vantage FREE only supports daily)`);
-      console.warn('[DataProvider] Falling back to daily candles');
+      console.log(`[DataProvider] Timeframe ${timeframe} not available (Alpha Vantage FREE only supports daily)`);
+      console.log('[DataProvider] Using daily candles instead');
     }
 
     const candles = await this.fetchAlphaVantageDaily(symbol, limit);
