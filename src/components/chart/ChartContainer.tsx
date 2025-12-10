@@ -4,6 +4,7 @@ import { useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { IChartApi, ISeriesApi } from 'lightweight-charts';
 import { Candle } from '@/lib/ict/types';
 import { useChartSetup } from './useChartSetup';
+import { cn } from '@/lib/utils';
 
 export interface ChartContainerProps {
   symbol: string;
@@ -44,16 +45,16 @@ const ChartContainer = forwardRef<ChartContainerRef, ChartContainerProps>(
     }, [candles]);
 
     return (
-      <div className={`relative w-full h-full ${className}`}>
+      <div className={cn('relative w-full h-full', className)}>
         {/* Chart Info Overlay */}
         <div className="absolute top-4 left-4 z-10 pointer-events-none">
-          <div className="bg-[#0a0a0f]/90 backdrop-blur-sm border border-[#1f2937] rounded-lg px-4 py-2 shadow-xl">
+          <div className="bg-card/90 backdrop-blur-sm border border-border rounded-lg px-4 py-2 shadow-xl">
             <div className="flex items-center gap-3">
-              <div className="text-sm font-semibold text-gray-100 font-mono">
+              <div className="text-sm font-semibold text-foreground font-mono">
                 {symbol}
               </div>
-              <div className="w-px h-4 bg-[#374151]" />
-              <div className="text-sm text-gray-400 font-mono">{timeframe}</div>
+              <div className="w-px h-4 bg-border" />
+              <div className="text-sm text-muted-foreground font-mono">{timeframe}</div>
             </div>
           </div>
         </div>
@@ -61,15 +62,15 @@ const ChartContainer = forwardRef<ChartContainerRef, ChartContainerProps>(
         {/* Chart Container */}
         <div
           ref={containerRef}
-          className="w-full h-full rounded-lg overflow-hidden border border-[#1f2937] shadow-2xl"
+          className="w-full h-full rounded-lg overflow-hidden border border-border shadow-2xl"
         />
 
         {/* Loading State */}
         {candles.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center bg-[#0a0a0f]/50 backdrop-blur-sm">
+          <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-sm">
             <div className="text-center space-y-3">
-              <div className="w-12 h-12 border-4 border-[#374151] border-t-[#8b5cf6] rounded-full animate-spin mx-auto" />
-              <p className="text-sm text-gray-400 font-mono">Loading chart data...</p>
+              <div className="w-12 h-12 border-4 border-border border-t-primary rounded-full animate-spin mx-auto" />
+              <p className="text-sm text-muted-foreground font-mono">Loading chart data...</p>
             </div>
           </div>
         )}

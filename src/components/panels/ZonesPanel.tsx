@@ -47,34 +47,34 @@ export function ZonesPanel() {
     return (
       <div
         key={zone.id}
-        className="p-3 rounded-lg bg-gradient-to-r from-amber-500/10 to-gold-500/10 border border-gold-500/30 cursor-pointer hover:border-gold-400/50 transition-all duration-200 shadow-[0_0_10px_rgba(251,191,36,0.15)]"
+        className="p-3 rounded-lg bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/30 cursor-pointer hover:border-amber-400/50 transition-all duration-200 shadow-[0_0_10px_rgba(251,191,36,0.15)]"
         onClick={() => {}}
       >
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2">
-            <Star className="w-4 h-4 text-gold-400 fill-gold-400" />
-            <span className={`text-sm font-semibold font-mono ${isBullish ? "text-emerald-400" : "text-red-400"}`}>
+            <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+            <span className={`text-sm font-semibold font-mono ${isBullish ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
               {isBullish ? "BULL" : "BEAR"}
             </span>
           </div>
           {zone.inOptimalZone && (
-            <Badge variant="outline" className="text-xs border-purple-500/30 text-purple-400">
+            <Badge variant="outline" className="text-xs border-purple-500/30 text-purple-600 dark:text-purple-400">
               OPTIMAL
             </Badge>
           )}
         </div>
         <div className="space-y-1">
           <div className="flex justify-between text-xs font-mono">
-            <span className="text-gray-500">Top:</span>
-            <span className="text-gray-300">${zone.overlapTop.toFixed(2)}</span>
+            <span className="text-muted-foreground">Top:</span>
+            <span className="text-foreground">${zone.overlapTop.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-xs font-mono">
-            <span className="text-gray-500">Bot:</span>
-            <span className="text-gray-300">${zone.overlapBottom.toFixed(2)}</span>
+            <span className="text-muted-foreground">Bot:</span>
+            <span className="text-foreground">${zone.overlapBottom.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-xs font-mono">
-            <span className="text-gray-500">Strength:</span>
-            <span className="text-gold-400">{zone.strength}%</span>
+            <span className="text-muted-foreground">Strength:</span>
+            <span className="text-amber-600 dark:text-amber-400">{zone.strength}%</span>
           </div>
         </div>
       </div>
@@ -92,15 +92,15 @@ export function ZonesPanel() {
         onClick={() => {}}
       >
         <div className="flex items-center justify-between mb-2">
-          <Badge variant="outline" className={`text-xs ${isBullish ? "border-emerald-500/30 text-emerald-400" : "border-red-500/30 text-red-400"}`}>
+          <Badge variant="outline" className={`text-xs ${isBullish ? "border-emerald-500/30 text-emerald-600 dark:text-emerald-400" : "border-red-500/30 text-red-600 dark:text-red-400"}`}>
             {isBullish ? "BULL OB" : "BEAR OB"}
           </Badge>
-          <span className="text-xs text-gray-500 font-mono">{ob.retestCount}x</span>
+          <span className="text-xs text-muted-foreground font-mono">{ob.retestCount}x</span>
         </div>
         <div className="space-y-1">
           <div className="flex justify-between text-xs font-mono">
-            <span className="text-gray-500">${ob.top.toFixed(2)}</span>
-            <span className="text-gray-500">${ob.bottom.toFixed(2)}</span>
+            <span className="text-muted-foreground">${ob.top.toFixed(2)}</span>
+            <span className="text-muted-foreground">${ob.bottom.toFixed(2)}</span>
           </div>
         </div>
       </div>
@@ -118,15 +118,15 @@ export function ZonesPanel() {
         onClick={() => {}}
       >
         <div className="flex items-center justify-between mb-2">
-          <Badge variant="outline" className={`text-xs ${isBullish ? "border-emerald-500/30 text-emerald-400" : "border-red-500/30 text-red-400"}`}>
+          <Badge variant="outline" className={`text-xs ${isBullish ? "border-emerald-500/30 text-emerald-600 dark:text-emerald-400" : "border-red-500/30 text-red-600 dark:text-red-400"}`}>
             {isBullish ? "BULL FVG" : "BEAR FVG"}
           </Badge>
-          <span className="text-xs text-gray-500 font-mono">{fvg.fillPercentage}%</span>
+          <span className="text-xs text-muted-foreground font-mono">{fvg.fillPercentage}%</span>
         </div>
         <div className="space-y-1">
           <div className="flex justify-between text-xs font-mono">
-            <span className="text-gray-500">${fvg.top.toFixed(2)}</span>
-            <span className="text-gray-500">${fvg.bottom.toFixed(2)}</span>
+            <span className="text-muted-foreground">${fvg.top.toFixed(2)}</span>
+            <span className="text-muted-foreground">${fvg.bottom.toFixed(2)}</span>
           </div>
         </div>
       </div>
@@ -143,19 +143,19 @@ export function ZonesPanel() {
     <div className={`space-y-2 ${highlight ? "order-first" : ""}`}>
       <button
         onClick={() => toggleSection(key)}
-        className="w-full flex items-center justify-between p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+        className="w-full flex items-center justify-between p-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
       >
         <div className="flex items-center gap-2">
           {expandedSections[key] ? (
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <ChevronDown className="w-4 h-4 text-muted-foreground" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
           )}
-          <span className={`text-xs font-semibold tracking-wider ${highlight ? "text-gold-400" : "text-gray-400"}`}>
+          <span className={`text-xs font-semibold tracking-wider ${highlight ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"}`}>
             {title}
           </span>
         </div>
-        <Badge variant="outline" className={`text-xs ${highlight ? "border-gold-500/30 text-gold-400" : "border-white/20 text-gray-400"}`}>
+        <Badge variant="outline" className={`text-xs ${highlight ? "border-amber-500/30 text-amber-600 dark:text-amber-400" : "border-border text-muted-foreground"}`}>
           {count}
         </Badge>
       </button>
@@ -164,9 +164,9 @@ export function ZonesPanel() {
   );
 
   return (
-    <Card className="bg-[#0a0a0f]/95 border-white/10 shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
+    <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-semibold tracking-wider text-purple-400">
+        <CardTitle className="text-sm font-semibold tracking-wider text-purple-600 dark:text-purple-400">
           ACTIVE ZONES
         </CardTitle>
       </CardHeader>

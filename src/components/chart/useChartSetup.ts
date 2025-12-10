@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useTheme } from 'next-themes';
 import {
   createChart,
   IChartApi,
@@ -25,6 +26,30 @@ interface ChartSetup {
   clearChart: () => void;
 }
 
+// Theme-based chart colors
+const chartThemes = {
+  light: {
+    background: '#fafafa',
+    text: '#374151',
+    grid: '#e5e7eb',
+    crosshair: '#6366f1',
+    crosshairLabel: '#4f46e5',
+    border: '#d1d5db',
+    upColor: '#16a34a',
+    downColor: '#dc2626',
+  },
+  dark: {
+    background: '#0f0f14',
+    text: '#d1d5db',
+    grid: '#1e1e2e',
+    crosshair: '#8b5cf6',
+    crosshairLabel: '#7c3aed',
+    border: '#27272a',
+    upColor: '#10b981',
+    downColor: '#ef4444',
+  },
+};
+
 export function useChartSetup(
   containerRef: React.RefObject<HTMLDivElement | null>,
   options: ChartOptions = {}
@@ -32,6 +57,10 @@ export function useChartSetup(
   const chartRef = useRef<IChartApi | null>(null);
   const candleSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const { resolvedTheme } = useTheme();
+
+  // Get current theme colors
+  const colors = chartThemes[resolvedTheme === 'dark' ? 'dark' : 'light'];
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -41,51 +70,51 @@ export function useChartSetup(
       width: options.width || container.clientWidth,
       height: options.height || container.clientHeight,
       layout: {
-        background: { type: ColorType.Solid, color: '#0a0a0f' },
-        textColor: '#d1d5db',
+        background: { type: ColorType.Solid, color: colors.background },
+        textColor: colors.text,
         fontSize: 12,
         fontFamily: 'JetBrains Mono, monospace',
       },
       grid: {
-        vertLines: { color: '#1a1a24', style: 1 },
-        horzLines: { color: '#1a1a24', style: 1 },
+        vertLines: { color: colors.grid, style: 1 },
+        horzLines: { color: colors.grid, style: 1 },
       },
       crosshair: {
         mode: CrosshairMode.Normal,
         vertLine: {
-          color: '#6b7280',
+          color: colors.crosshair,
           width: 1,
           style: 3,
-          labelBackgroundColor: '#374151',
+          labelBackgroundColor: colors.crosshairLabel,
         },
         horzLine: {
-          color: '#6b7280',
+          color: colors.crosshair,
           width: 1,
           style: 3,
-          labelBackgroundColor: '#374151',
+          labelBackgroundColor: colors.crosshairLabel,
         },
       },
       rightPriceScale: {
-        borderColor: '#1f2937',
-        textColor: '#9ca3af',
+        borderColor: colors.border,
+        textColor: colors.text,
         scaleMargins: {
           top: 0.1,
           bottom: 0.1,
         },
       },
       timeScale: {
-        borderColor: '#1f2937',
+        borderColor: colors.border,
         timeVisible: true,
         secondsVisible: false,
       },
     });
 
     const candleSeries = chart.addCandlestickSeries({
-      upColor: '#10b981',
-      downColor: '#ef4444',
+      upColor: colors.upColor,
+      downColor: colors.downColor,
       borderVisible: false,
-      wickUpColor: '#10b981',
-      wickDownColor: '#ef4444',
+      wickUpColor: colors.upColor,
+      wickDownColor: colors.downColor,
     });
 
     chartRef.current = chart;
@@ -128,7 +157,7 @@ export function useChartSetup(
       candleSeriesRef.current = null;
       setIsReady(false);
     };
-  }, [containerRef, options.width, options.height]);
+  }, [containerRef, options.width, options.height, resolvedTheme, colors]);
 
   const updateCandles = (candles: Candle[]) => {
     if (!candleSeriesRef.current || !isReady) return;

@@ -57,42 +57,42 @@ export function PositionsPanel() {
 
   if (positions.length === 0) {
     return (
-      <Card className="bg-[#0a0a0f]/95 border-white/10 shadow-xl backdrop-blur-sm">
+      <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-semibold tracking-wider text-amber-400">
+            <CardTitle className="text-sm font-semibold tracking-wider text-amber-600 dark:text-amber-400">
               OPEN POSITIONS
             </CardTitle>
-            <Badge variant="outline" className="text-xs border-zinc-700 text-zinc-500">
+            <Badge variant="outline" className="text-xs border-border text-muted-foreground">
               0
             </Badge>
           </div>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-6 space-y-3">
-          <div className="p-3 rounded-full bg-zinc-800/50 border border-zinc-700">
-            <Layers className="h-6 w-6 text-zinc-600" />
+          <div className="p-3 rounded-full bg-secondary border border-border">
+            <Layers className="h-6 w-6 text-muted-foreground" />
           </div>
-          <p className="text-sm text-zinc-500">No open positions</p>
-          <p className="text-xs text-zinc-600">Place a trade to get started</p>
+          <p className="text-sm text-muted-foreground">No open positions</p>
+          <p className="text-xs text-muted-foreground/70">Place a trade to get started</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="bg-[#0a0a0f]/95 border-white/10 shadow-xl backdrop-blur-sm hover:border-amber-500/30 transition-all duration-300">
+    <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-amber-500/30 transition-all duration-300">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm font-semibold tracking-wider text-amber-400">
+          <CardTitle className="text-sm font-semibold tracking-wider text-amber-600 dark:text-amber-400">
             OPEN POSITIONS
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-xs border-amber-500/30 text-amber-400">
+            <Badge variant="outline" className="text-xs border-amber-500/30 text-amber-600 dark:text-amber-400">
               {positions.length}
             </Badge>
             <span className={cn(
               "text-sm font-mono font-bold",
-              isProfitable ? "text-emerald-400" : "text-red-400"
+              isProfitable ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
             )}>
               {isProfitable ? "+" : ""}${totalProfit.toFixed(2)}
             </span>
@@ -129,16 +129,16 @@ function PositionItem({ position, onClose, formatPrice }: PositionItemProps) {
   const isBuy = position.type === "buy";
 
   return (
-    <div className="p-3 rounded-lg bg-white/5 border border-white/10 space-y-2">
+    <div className="p-3 rounded-lg bg-secondary/50 border border-border space-y-2">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {isBuy ? (
-            <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
+            <TrendingUp className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
           ) : (
-            <TrendingDown className="h-3.5 w-3.5 text-red-400" />
+            <TrendingDown className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
           )}
-          <span className="font-mono text-sm font-medium text-white">
+          <span className="font-mono text-sm font-medium text-foreground">
             {position.symbol}
           </span>
           <Badge
@@ -146,26 +146,26 @@ function PositionItem({ position, onClose, formatPrice }: PositionItemProps) {
             className={cn(
               "text-xs px-1.5 py-0",
               isBuy
-                ? "border-emerald-500/30 text-emerald-400"
-                : "border-red-500/30 text-red-400"
+                ? "border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                : "border-red-500/30 text-red-600 dark:text-red-400"
             )}
           >
             {position.type.toUpperCase()}
           </Badge>
         </div>
-        <span className="text-xs font-mono text-zinc-500">
+        <span className="text-xs font-mono text-muted-foreground">
           {position.volume.toFixed(2)} lots
         </span>
       </div>
 
       {/* Prices */}
       <div className="flex items-center gap-2 text-xs">
-        <span className="text-zinc-500">Entry:</span>
-        <span className="font-mono text-zinc-400">
+        <span className="text-muted-foreground">Entry:</span>
+        <span className="font-mono text-muted-foreground">
           {formatPrice(position.openPrice, position.symbol)}
         </span>
-        <span className="text-zinc-600">→</span>
-        <span className="font-mono text-white">
+        <span className="text-muted-foreground/50">→</span>
+        <span className="font-mono text-foreground">
           {formatPrice(position.currentPrice, position.symbol)}
         </span>
       </div>
@@ -174,23 +174,23 @@ function PositionItem({ position, onClose, formatPrice }: PositionItemProps) {
       {(position.stopLoss || position.takeProfit) && (
         <div className="flex gap-3 text-xs">
           {position.stopLoss && (
-            <span className="text-zinc-500">
-              SL: <span className="font-mono text-red-400">{formatPrice(position.stopLoss, position.symbol)}</span>
+            <span className="text-muted-foreground">
+              SL: <span className="font-mono text-red-600 dark:text-red-400">{formatPrice(position.stopLoss, position.symbol)}</span>
             </span>
           )}
           {position.takeProfit && (
-            <span className="text-zinc-500">
-              TP: <span className="font-mono text-emerald-400">{formatPrice(position.takeProfit, position.symbol)}</span>
+            <span className="text-muted-foreground">
+              TP: <span className="font-mono text-emerald-600 dark:text-emerald-400">{formatPrice(position.takeProfit, position.symbol)}</span>
             </span>
           )}
         </div>
       )}
 
       {/* P/L and Close */}
-      <div className="flex items-center justify-between pt-1 border-t border-white/5">
+      <div className="flex items-center justify-between pt-1 border-t border-border">
         <span className={cn(
           "font-mono text-sm font-bold",
-          isProfit ? "text-emerald-400" : "text-red-400"
+          isProfit ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
         )}>
           {isProfit ? "+" : ""}${position.profit.toFixed(2)}
         </span>
@@ -198,7 +198,7 @@ function PositionItem({ position, onClose, formatPrice }: PositionItemProps) {
           size="sm"
           variant="ghost"
           onClick={() => onClose(position.id)}
-          className="h-7 px-2 text-xs hover:bg-red-500/20 hover:text-red-400"
+          className="h-7 px-2 text-xs hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-400"
         >
           <X className="h-3 w-3 mr-1" />
           Close

@@ -33,19 +33,19 @@ export function AccountPanel() {
   const isProfitable = profit >= 0;
 
   return (
-    <Card className="bg-[#0a0a0f]/95 border-white/10 shadow-xl backdrop-blur-sm hover:border-cyan-500/30 transition-all duration-300">
+    <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-cyan-500/30 transition-all duration-300">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm font-semibold tracking-wider text-cyan-400">
+          <CardTitle className="text-sm font-semibold tracking-wider text-cyan-600 dark:text-cyan-400">
             ACCOUNT
           </CardTitle>
           <div className="flex items-center gap-2">
-            <div className={`h-2 w-2 rounded-full ${isConnected ? "bg-emerald-500 animate-pulse" : "bg-zinc-600"}`} />
+            <div className={`h-2 w-2 rounded-full ${isConnected ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/30"}`} />
             <Badge
               variant="outline"
               className={`text-xs ${isConnected
-                ? "border-emerald-500/30 text-emerald-400"
-                : "border-zinc-500/30 text-zinc-400"}`}
+                ? "border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                : "border-border text-muted-foreground"}`}
             >
               {isConnected ? "DEMO" : "OFFLINE"}
             </Badge>
@@ -56,21 +56,21 @@ export function AccountPanel() {
       <CardContent className="space-y-4">
         {/* Balance & Equity */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+          <div className="p-3 rounded-lg bg-secondary/50 border border-border/50">
             <div className="flex items-center gap-2 mb-1">
-              <Wallet className="h-3.5 w-3.5 text-cyan-400" />
-              <span className="text-xs text-zinc-500 uppercase">Balance</span>
+              <Wallet className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" />
+              <span className="text-xs text-muted-foreground uppercase">Balance</span>
             </div>
-            <span className="text-lg font-bold font-mono text-white">
+            <span className="text-lg font-bold font-mono text-foreground">
               ${formatCurrency(accountInfo?.balance)}
             </span>
           </div>
-          <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+          <div className="p-3 rounded-lg bg-secondary/50 border border-border/50">
             <div className="flex items-center gap-2 mb-1">
-              <DollarSign className="h-3.5 w-3.5 text-cyan-400" />
-              <span className="text-xs text-zinc-500 uppercase">Equity</span>
+              <DollarSign className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" />
+              <span className="text-xs text-muted-foreground uppercase">Equity</span>
             </div>
-            <span className="text-lg font-bold font-mono text-white">
+            <span className="text-lg font-bold font-mono text-foreground">
               ${formatCurrency(accountInfo?.equity)}
             </span>
           </div>
@@ -84,13 +84,13 @@ export function AccountPanel() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {isProfitable ? (
-                <TrendingUp className="h-4 w-4 text-emerald-400" />
+                <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               ) : (
-                <TrendingDown className="h-4 w-4 text-red-400" />
+                <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />
               )}
-              <span className="text-xs text-zinc-400 uppercase">Floating P/L</span>
+              <span className="text-xs text-muted-foreground uppercase">Floating P/L</span>
             </div>
-            <span className={`text-lg font-bold font-mono ${isProfitable ? "text-emerald-400" : "text-red-400"}`}>
+            <span className={`text-lg font-bold font-mono ${isProfitable ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
               {isProfitable ? "+" : ""}{formatCurrency(profit)}
             </span>
           </div>
@@ -98,25 +98,25 @@ export function AccountPanel() {
 
         {/* Margin Info */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/5 border border-white/10">
-            <span className="text-xs text-zinc-500">Margin Used</span>
-            <span className="text-sm font-mono text-white">${formatCurrency(accountInfo?.margin)}</span>
+          <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-secondary/50 border border-border/50">
+            <span className="text-xs text-muted-foreground">Margin Used</span>
+            <span className="text-sm font-mono text-foreground">${formatCurrency(accountInfo?.margin)}</span>
           </div>
-          <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/5 border border-white/10">
-            <span className="text-xs text-zinc-500">Free Margin</span>
-            <span className="text-sm font-mono text-white">${formatCurrency(accountInfo?.freeMargin)}</span>
+          <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-secondary/50 border border-border/50">
+            <span className="text-xs text-muted-foreground">Free Margin</span>
+            <span className="text-sm font-mono text-foreground">${formatCurrency(accountInfo?.freeMargin)}</span>
           </div>
-          <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/5 border border-white/10">
+          <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-secondary/50 border border-border/50">
             <div className="flex items-center gap-1.5">
-              <Percent className="h-3 w-3 text-zinc-500" />
-              <span className="text-xs text-zinc-500">Margin Level</span>
+              <Percent className="h-3 w-3 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Margin Level</span>
             </div>
             <span className={`text-sm font-mono ${
               (accountInfo?.marginLevel ?? 0) > 200
-                ? "text-emerald-400"
+                ? "text-emerald-600 dark:text-emerald-400"
                 : (accountInfo?.marginLevel ?? 0) > 100
-                  ? "text-amber-400"
-                  : "text-red-400"
+                  ? "text-amber-600 dark:text-amber-400"
+                  : "text-red-600 dark:text-red-400"
             }`}>
               {formatPercent(accountInfo?.marginLevel)}
             </span>
@@ -124,22 +124,22 @@ export function AccountPanel() {
         </div>
 
         {/* Account Details */}
-        <div className="pt-2 border-t border-white/10 space-y-2">
+        <div className="pt-2 border-t border-border space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <Shield className="h-3 w-3 text-zinc-500" />
-              <span className="text-xs text-zinc-500">Leverage</span>
+              <Shield className="h-3 w-3 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Leverage</span>
             </div>
-            <span className="text-xs font-mono text-purple-400">
+            <span className="text-xs font-mono text-purple-600 dark:text-purple-400">
               1:{accountInfo?.leverage ?? 100}
             </span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <Server className="h-3 w-3 text-zinc-500" />
-              <span className="text-xs text-zinc-500">Server</span>
+              <Server className="h-3 w-3 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Server</span>
             </div>
-            <span className="text-xs font-mono text-zinc-400">
+            <span className="text-xs font-mono text-muted-foreground">
               {accountInfo?.server ?? "—"}
             </span>
           </div>

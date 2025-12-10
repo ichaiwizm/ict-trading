@@ -41,75 +41,141 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* Trading specific colors */
+  --color-chart-bg: var(--chart-bg);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-text: var(--chart-text);
+  --color-chart-crosshair: var(--chart-crosshair);
 }
 
+/* ========================================
+   LIGHT MODE - Clean & Professional
+   ======================================== */
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  
+  /* Base colors - Warm white tones */
+  --background: oklch(0.985 0.002 90);
+  --foreground: oklch(0.18 0.02 260);
+  
+  /* Cards - Subtle elevation */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.18 0.02 260);
+  
+  /* Popovers - Floating elements */
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.18 0.02 260);
+  
+  /* Primary - Deep indigo */
+  --primary: oklch(0.45 0.2 270);
+  --primary-foreground: oklch(0.98 0 0);
+  
+  /* Secondary - Soft gray */
+  --secondary: oklch(0.96 0.005 270);
+  --secondary-foreground: oklch(0.25 0.02 260);
+  
+  /* Muted - Subtle backgrounds */
+  --muted: oklch(0.955 0.008 270);
+  --muted-foreground: oklch(0.45 0.02 260);
+  
+  /* Accent - Highlight color */
+  --accent: oklch(0.94 0.02 270);
+  --accent-foreground: oklch(0.25 0.02 260);
+  
+  /* Destructive - Error states */
+  --destructive: oklch(0.55 0.22 25);
+  
+  /* Borders & Inputs */
+  --border: oklch(0.88 0.01 270);
+  --input: oklch(0.92 0.01 270);
+  --ring: oklch(0.55 0.18 270);
+  
+  /* Chart colors for light mode */
+  --chart-1: oklch(0.55 0.2 270);
+  --chart-2: oklch(0.55 0.15 180);
+  --chart-3: oklch(0.55 0.18 140);
+  --chart-4: oklch(0.65 0.2 45);
+  --chart-5: oklch(0.55 0.2 25);
+  
+  /* Sidebar */
+  --sidebar: oklch(0.98 0.005 270);
+  --sidebar-foreground: oklch(0.18 0.02 260);
+  --sidebar-primary: oklch(0.45 0.2 270);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.94 0.02 270);
+  --sidebar-accent-foreground: oklch(0.25 0.02 260);
+  --sidebar-border: oklch(0.88 0.01 270);
+  --sidebar-ring: oklch(0.55 0.18 270);
+  
+  /* Chart specific - Light mode with better contrast */
+  --chart-bg: oklch(0.99 0.002 270);
+  --chart-grid: oklch(0.92 0.01 270);
+  --chart-text: oklch(0.35 0.02 260);
+  --chart-crosshair: oklch(0.45 0.2 270);
 }
 
+/* ========================================
+   DARK MODE - Sophisticated Trading UI
+   ======================================== */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  /* Base colors - Deep blue-gray */
+  --background: oklch(0.13 0.015 260);
+  --foreground: oklch(0.95 0.01 90);
+  
+  /* Cards - Elevated surfaces */
+  --card: oklch(0.18 0.02 260);
+  --card-foreground: oklch(0.95 0.01 90);
+  
+  /* Popovers */
+  --popover: oklch(0.18 0.02 260);
+  --popover-foreground: oklch(0.95 0.01 90);
+  
+  /* Primary - Vibrant purple */
+  --primary: oklch(0.72 0.2 280);
+  --primary-foreground: oklch(0.15 0.02 260);
+  
+  /* Secondary */
+  --secondary: oklch(0.22 0.02 260);
+  --secondary-foreground: oklch(0.92 0.01 90);
+  
+  /* Muted */
+  --muted: oklch(0.22 0.02 260);
+  --muted-foreground: oklch(0.65 0.02 260);
+  
+  /* Accent */
+  --accent: oklch(0.25 0.025 260);
+  --accent-foreground: oklch(0.92 0.01 90);
+  
+  /* Destructive */
+  --destructive: oklch(0.65 0.22 25);
+  
+  /* Borders & Inputs */
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 8%);
+  --ring: oklch(0.72 0.2 280);
+  
+  /* Chart colors for dark mode */
+  --chart-1: oklch(0.72 0.2 280);
+  --chart-2: oklch(0.7 0.18 180);
+  --chart-3: oklch(0.75 0.2 140);
+  --chart-4: oklch(0.8 0.2 60);
+  --chart-5: oklch(0.7 0.22 25);
+  
+  /* Sidebar */
+  --sidebar: oklch(0.16 0.02 260);
+  --sidebar-foreground: oklch(0.95 0.01 90);
+  --sidebar-primary: oklch(0.72 0.2 280);
+  --sidebar-primary-foreground: oklch(0.15 0.02 260);
+  --sidebar-accent: oklch(0.22 0.02 260);
+  --sidebar-accent-foreground: oklch(0.92 0.01 90);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: oklch(0.72 0.2 280);
+  
+  /* Chart specific - Dark mode */
+  --chart-bg: oklch(0.11 0.015 260);
+  --chart-grid: oklch(0.2 0.015 260);
+  --chart-text: oklch(0.7 0.02 260);
+  --chart-crosshair: oklch(0.72 0.2 280);
 }
 
 @layer base {
@@ -121,40 +187,50 @@
   }
 }
 
-/* Trading-specific colors */
+/* ========================================
+   TRADING-SPECIFIC COLORS
+   ======================================== */
+
+/* Light mode trading colors */
 :root {
-  --bullish: oklch(0.72 0.19 142);
-  --bearish: oklch(0.65 0.24 25);
-  --bullish-muted: oklch(0.72 0.19 142 / 20%);
-  --bearish-muted: oklch(0.65 0.24 25 / 20%);
-  --order-block: oklch(0.65 0.2 265);
-  --order-block-muted: oklch(0.65 0.2 265 / 30%);
-  --fvg: oklch(0.75 0.15 85);
-  --fvg-muted: oklch(0.75 0.15 85 / 25%);
-  --fibonacci: oklch(0.7 0.15 200);
-  --confluence: oklch(0.8 0.2 50);
-  --killzone-active: oklch(0.72 0.19 142);
-  --killzone-inactive: oklch(0.5 0 0);
+  --bullish: oklch(0.55 0.18 145);
+  --bearish: oklch(0.55 0.22 25);
+  --bullish-muted: oklch(0.55 0.18 145 / 15%);
+  --bearish-muted: oklch(0.55 0.22 25 / 15%);
+  --order-block: oklch(0.5 0.2 270);
+  --order-block-muted: oklch(0.5 0.2 270 / 20%);
+  --fvg: oklch(0.6 0.18 85);
+  --fvg-muted: oklch(0.6 0.18 85 / 20%);
+  --fibonacci: oklch(0.55 0.15 210);
+  --confluence: oklch(0.65 0.2 55);
+  --killzone-active: oklch(0.55 0.18 145);
+  --killzone-inactive: oklch(0.6 0.02 260);
 }
 
+/* Dark mode trading colors */
 .dark {
-  --bullish: oklch(0.75 0.2 145);
-  --bearish: oklch(0.7 0.25 25);
-  --bullish-muted: oklch(0.75 0.2 145 / 25%);
-  --bearish-muted: oklch(0.7 0.25 25 / 25%);
-  --order-block: oklch(0.7 0.22 270);
-  --order-block-muted: oklch(0.7 0.22 270 / 35%);
-  --fvg: oklch(0.8 0.18 80);
-  --fvg-muted: oklch(0.8 0.18 80 / 30%);
-  --fibonacci: oklch(0.75 0.18 205);
-  --confluence: oklch(0.85 0.22 55);
-  --killzone-active: oklch(0.75 0.2 145);
-  --killzone-inactive: oklch(0.45 0 0);
+  --bullish: oklch(0.72 0.2 145);
+  --bearish: oklch(0.68 0.24 25);
+  --bullish-muted: oklch(0.72 0.2 145 / 25%);
+  --bearish-muted: oklch(0.68 0.24 25 / 25%);
+  --order-block: oklch(0.7 0.22 280);
+  --order-block-muted: oklch(0.7 0.22 280 / 35%);
+  --fvg: oklch(0.78 0.18 85);
+  --fvg-muted: oklch(0.78 0.18 85 / 30%);
+  --fibonacci: oklch(0.72 0.18 210);
+  --confluence: oklch(0.82 0.22 55);
+  --killzone-active: oklch(0.72 0.2 145);
+  --killzone-inactive: oklch(0.45 0.02 260);
 }
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
 
 /* Chart container styling */
 .chart-container {
   @apply rounded-lg overflow-hidden;
+  background-color: var(--chart-bg);
 }
 
 /* Trading panel glass effect */
@@ -162,7 +238,21 @@
   @apply bg-card/80 backdrop-blur-sm border border-border/50;
 }
 
-/* Animation for alerts */
+/* Smooth theme transitions */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.no-transitions,
+html.no-transitions * {
+  transition: none !important;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+/* Alert pulse animation */
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 5px var(--bullish-muted); }
   50% { box-shadow: 0 0 20px var(--bullish-muted); }
@@ -170,4 +260,27 @@
 
 .alert-pulse {
   animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Theme toggle animation */
+@keyframes theme-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Skeleton loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 25%,
+    var(--secondary) 50%,
+    var(--muted) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
 }

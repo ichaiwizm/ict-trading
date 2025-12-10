@@ -33,18 +33,18 @@ export function LotCalculator() {
   });
 
   return (
-    <Card className="border-zinc-800 bg-zinc-900/50 backdrop-blur-sm">
+    <Card className="border-border bg-card/50 backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
+        <CardTitle className="text-sm font-semibold uppercase tracking-wider text-purple-600 dark:text-purple-400">
           Lot Calculator
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Account Balance */}
         <div className="space-y-2">
-          <label className="text-xs text-zinc-400">Account Balance</label>
+          <label className="text-xs text-muted-foreground">Account Balance</label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               $
             </span>
             <Input
@@ -60,8 +60,8 @@ export function LotCalculator() {
         {/* Risk Percentage Slider */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-xs text-zinc-400">Risk %</label>
-            <span className="font-mono text-sm font-semibold text-purple-400">
+            <label className="text-xs text-muted-foreground">Risk %</label>
+            <span className="font-mono text-sm font-semibold text-purple-600 dark:text-purple-400">
               {riskPercentage.toFixed(1)}%
             </span>
           </div>
@@ -73,7 +73,7 @@ export function LotCalculator() {
             step={0.1}
             className="w-full"
           />
-          <div className="flex justify-between text-xs text-zinc-600">
+          <div className="flex justify-between text-xs text-muted-foreground/60">
             <span>0.5%</span>
             <span>5%</span>
           </div>
@@ -81,7 +81,7 @@ export function LotCalculator() {
 
         {/* Stop Loss Pips */}
         <div className="space-y-2">
-          <label className="text-xs text-zinc-400">Stop Loss (pips)</label>
+          <label className="text-xs text-muted-foreground">Stop Loss (pips)</label>
           <Input
             type="number"
             value={stopLossPips}
@@ -92,31 +92,31 @@ export function LotCalculator() {
         </div>
 
         {/* Calculated Results */}
-        <div className="space-y-3 border-t border-zinc-800 pt-4">
+        <div className="space-y-3 border-t border-border pt-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-zinc-500">Lot Size</span>
-            <span className="font-mono text-2xl font-bold text-emerald-400">
+            <span className="text-xs text-muted-foreground">Lot Size</span>
+            <span className="font-mono text-2xl font-bold text-emerald-600 dark:text-emerald-400">
               {calculation.lotSize.toFixed(2)}
             </span>
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-xs text-zinc-500">Risk Amount</span>
-            <span className="font-mono text-lg font-semibold text-amber-400">
+            <span className="text-xs text-muted-foreground">Risk Amount</span>
+            <span className="font-mono text-lg font-semibold text-amber-600 dark:text-amber-400">
               ${calculation.riskAmount.toFixed(2)}
             </span>
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-xs text-zinc-500">Pip Value</span>
-            <span className="font-mono text-sm text-zinc-300">
+            <span className="text-xs text-muted-foreground">Pip Value</span>
+            <span className="font-mono text-sm text-foreground">
               ${calculation.pipValue.toFixed(2)}/pip
             </span>
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-xs text-zinc-500">Max Loss</span>
-            <span className="font-mono text-sm text-red-400">
+            <span className="text-xs text-muted-foreground">Max Loss</span>
+            <span className="font-mono text-sm text-red-600 dark:text-red-400">
               ${calculation.maxLoss.toFixed(2)}
             </span>
           </div>

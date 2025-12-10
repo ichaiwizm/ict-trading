@@ -85,15 +85,15 @@ export function KillZonePanel() {
         className={`p-3 rounded-lg border transition-all duration-300 ${
           zone.isActive
             ? "bg-emerald-500/10 border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
-            : "bg-white/5 border-white/10"
+            : "bg-secondary/50 border-border/50"
         }`}
       >
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             {zone.isActive && (
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
             )}
-            <span className={`font-mono text-sm font-semibold ${zone.isActive ? "text-emerald-400" : "text-gray-400"}`}>
+            <span className={`font-mono text-sm font-semibold ${zone.isActive ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>
               {ZONE_LABELS[zone.name]}
             </span>
           </div>
@@ -101,23 +101,23 @@ export function KillZonePanel() {
             variant="outline"
             className={`text-xs ${
               zone.volatilityExpected === "high"
-                ? "border-red-500/30 text-red-400"
+                ? "border-red-500/30 text-red-600 dark:text-red-400"
                 : zone.volatilityExpected === "medium"
-                ? "border-amber-500/30 text-amber-400"
-                : "border-gray-500/30 text-gray-400"
+                ? "border-amber-500/30 text-amber-600 dark:text-amber-400"
+                : "border-border text-muted-foreground"
             }`}
           >
             {zone.volatilityExpected.toUpperCase()}
           </Badge>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
           <Clock className="w-3 h-3" />
           <span className="font-mono">{timeInfo}</span>
         </div>
 
         {zone.isActive && (
-          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(16,185,129,0.6)]"
               style={{ width: `${progress}%` }}
@@ -129,9 +129,9 @@ export function KillZonePanel() {
   };
 
   return (
-    <Card className="bg-[#0a0a0f]/95 border-white/10 shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
+    <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-semibold tracking-wider text-purple-400">
+        <CardTitle className="text-sm font-semibold tracking-wider text-purple-600 dark:text-purple-400">
           KILL ZONES
         </CardTitle>
       </CardHeader>

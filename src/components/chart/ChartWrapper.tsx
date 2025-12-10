@@ -210,7 +210,7 @@ export function ChartWrapper() {
   }, [clearOverlays]);
 
   return (
-    <div className="flex flex-col h-full bg-zinc-900 rounded-xl overflow-hidden">
+    <div className="flex flex-col h-full bg-card rounded-xl overflow-hidden border border-border/50">
       <ChartToolbar
         symbol={symbol}
         timeframe={timeframe}

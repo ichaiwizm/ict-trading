@@ -102,15 +102,15 @@ export function TradePanel() {
   };
 
   return (
-    <Card className="bg-[#0a0a0f]/95 border-white/10 shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
+    <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm font-semibold tracking-wider text-purple-400">
+          <CardTitle className="text-sm font-semibold tracking-wider text-purple-600 dark:text-purple-400">
             TRADE EXECUTION
           </CardTitle>
           <Badge
             variant="outline"
-            className="text-xs border-cyan-500/30 text-cyan-400"
+            className="text-xs border-cyan-500/30 text-cyan-600 dark:text-cyan-400"
           >
             {symbol}
           </Badge>
@@ -125,14 +125,14 @@ export function TradePanel() {
             className={`p-3 rounded-lg border transition-all ${
               orderType === "sell"
                 ? "bg-red-500/20 border-red-500/50"
-                : "bg-white/5 border-white/10 hover:border-red-500/30"
+                : "bg-secondary/50 border-border hover:border-red-500/30"
             }`}
           >
             <div className="flex items-center justify-center gap-1 mb-1">
-              <TrendingDown className="h-3.5 w-3.5 text-red-400" />
-              <span className="text-xs text-red-400 uppercase font-medium">Sell</span>
+              <TrendingDown className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
+              <span className="text-xs text-red-600 dark:text-red-400 uppercase font-medium">Sell</span>
             </div>
-            <span className="text-lg font-bold font-mono text-red-400">
+            <span className="text-lg font-bold font-mono text-red-600 dark:text-red-400">
               {formatPrice(bid)}
             </span>
           </button>
@@ -142,14 +142,14 @@ export function TradePanel() {
             className={`p-3 rounded-lg border transition-all ${
               orderType === "buy"
                 ? "bg-emerald-500/20 border-emerald-500/50"
-                : "bg-white/5 border-white/10 hover:border-emerald-500/30"
+                : "bg-secondary/50 border-border hover:border-emerald-500/30"
             }`}
           >
             <div className="flex items-center justify-center gap-1 mb-1">
-              <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
-              <span className="text-xs text-emerald-400 uppercase font-medium">Buy</span>
+              <TrendingUp className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 uppercase font-medium">Buy</span>
             </div>
-            <span className="text-lg font-bold font-mono text-emerald-400">
+            <span className="text-lg font-bold font-mono text-emerald-600 dark:text-emerald-400">
               {formatPrice(ask)}
             </span>
           </button>
@@ -157,16 +157,16 @@ export function TradePanel() {
 
         {/* Spread */}
         <div className="flex items-center justify-center">
-          <span className="text-xs text-zinc-500">
-            Spread: <span className="font-mono text-zinc-400">{(spread / pipSize).toFixed(1)} pips</span>
+          <span className="text-xs text-muted-foreground">
+            Spread: <span className="font-mono text-foreground">{(spread / pipSize).toFixed(1)} pips</span>
           </span>
         </div>
 
         {/* Lot Size */}
         <div className="space-y-2">
-          <label className="text-xs text-zinc-400 flex items-center justify-between">
+          <label className="text-xs text-muted-foreground flex items-center justify-between">
             <span>Volume (lots)</span>
-            <span className="text-zinc-600">Min: 0.01</span>
+            <span className="text-muted-foreground/70">Min: 0.01</span>
           </label>
           <Input
             type="number"
@@ -183,8 +183,8 @@ export function TradePanel() {
                 onClick={() => setLotSize(size)}
                 className={`flex-1 py-1 text-xs font-mono rounded transition-colors ${
                   lotSize === size
-                    ? "bg-purple-500/30 text-purple-400"
-                    : "bg-white/5 text-zinc-500 hover:bg-white/10"
+                    ? "bg-purple-500/30 text-purple-600 dark:text-purple-400"
+                    : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
                 }`}
               >
                 {size}
@@ -196,8 +196,8 @@ export function TradePanel() {
         {/* SL/TP */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
-            <label className="text-xs text-zinc-400 flex items-center gap-1">
-              <ShieldAlert className="h-3 w-3 text-red-400" />
+            <label className="text-xs text-muted-foreground flex items-center gap-1">
+              <ShieldAlert className="h-3 w-3 text-red-500" />
               Stop Loss
             </label>
             <Input
@@ -210,8 +210,8 @@ export function TradePanel() {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-xs text-zinc-400 flex items-center gap-1">
-              <Target className="h-3 w-3 text-emerald-400" />
+            <label className="text-xs text-muted-foreground flex items-center gap-1">
+              <Target className="h-3 w-3 text-emerald-500" />
               Take Profit
             </label>
             <Input
@@ -255,7 +255,7 @@ export function TradePanel() {
             variant="outline"
             onClick={() => handleQuickOrder("sell")}
             disabled={isPlacingOrder}
-            className="border-red-500/30 text-red-400 hover:bg-red-500/20"
+            className="border-red-500/30 text-red-600 dark:text-red-400 hover:bg-red-500/20"
           >
             <TrendingDown className="h-4 w-4 mr-1" />
             Quick Sell
@@ -264,7 +264,7 @@ export function TradePanel() {
             variant="outline"
             onClick={() => handleQuickOrder("buy")}
             disabled={isPlacingOrder}
-            className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
+            className="border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
           >
             <TrendingUp className="h-4 w-4 mr-1" />
             Quick Buy
@@ -273,7 +273,7 @@ export function TradePanel() {
 
         {/* Demo Mode Notice */}
         <div className="text-center">
-          <span className="text-xs text-zinc-600">
+          <span className="text-xs text-muted-foreground/70">
             Demo mode - Orders are simulated
           </span>
         </div>

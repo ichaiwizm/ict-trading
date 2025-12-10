@@ -36,7 +36,7 @@ export function MobileNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-zinc-800 bg-zinc-950/95 backdrop-blur supports-[backdrop-filter]:bg-zinc-950/90">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90">
       <div className="grid h-16 grid-cols-4">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -50,14 +50,14 @@ export function MobileNav() {
                 'flex flex-col items-center justify-center gap-1 transition-colors',
                 'active:scale-95',
                 isActive
-                  ? 'text-cyan-400'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <div className="relative">
                 <Icon className="h-5 w-5" />
                 {isActive && (
-                  <div className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-cyan-400" />
+                  <div className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-primary" />
                 )}
               </div>
               <span className="font-mono text-xs font-medium">

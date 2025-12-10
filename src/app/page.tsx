@@ -146,7 +146,7 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="min-h-screen bg-background">
       <Header />
 
       <main>
@@ -172,23 +172,23 @@ export default function DashboardPage() {
 
 function DashboardSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background p-4 md:p-6">
       <div className="mx-auto max-w-[2000px] space-y-4">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="h-[500px] lg:h-[600px] animate-pulse rounded-xl bg-zinc-900/50" />
+            <div className="h-[500px] lg:h-[600px] animate-pulse rounded-xl bg-muted/50" />
           </div>
           <div className="space-y-4">
-            <div className="h-40 animate-pulse rounded-xl bg-zinc-900/50" />
-            <div className="h-40 animate-pulse rounded-xl bg-zinc-900/50" />
-            <div className="h-40 animate-pulse rounded-xl bg-zinc-900/50" />
+            <div className="h-40 animate-pulse rounded-xl bg-muted/50" />
+            <div className="h-40 animate-pulse rounded-xl bg-muted/50" />
+            <div className="h-40 animate-pulse rounded-xl bg-muted/50" />
           </div>
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <div className="h-48 animate-pulse rounded-xl bg-zinc-900/50" />
-          <div className="h-48 animate-pulse rounded-xl bg-zinc-900/50" />
-          <div className="h-48 animate-pulse rounded-xl bg-zinc-900/50" />
-          <div className="h-48 animate-pulse rounded-xl bg-zinc-900/50" />
+          <div className="h-48 animate-pulse rounded-xl bg-muted/50" />
+          <div className="h-48 animate-pulse rounded-xl bg-muted/50" />
+          <div className="h-48 animate-pulse rounded-xl bg-muted/50" />
+          <div className="h-48 animate-pulse rounded-xl bg-muted/50" />
         </div>
       </div>
     </div>

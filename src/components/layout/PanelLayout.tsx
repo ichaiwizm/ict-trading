@@ -15,20 +15,20 @@ function Panel({ children, className, title, subtitle, action }: PanelProps) {
   return (
     <div
       className={cn(
-        'rounded-xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-sm',
-        'shadow-lg shadow-black/20',
+        'rounded-xl border border-border bg-card/50 backdrop-blur-sm',
+        'shadow-lg shadow-black/5 dark:shadow-black/20',
         'overflow-hidden',
         className
       )}
     >
       {title && (
-        <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <div>
-            <h3 className="font-mono text-sm font-semibold text-white">
+            <h3 className="font-mono text-sm font-semibold text-foreground">
               {title}
             </h3>
             {subtitle && (
-              <p className="text-xs text-zinc-500">{subtitle}</p>
+              <p className="text-xs text-muted-foreground">{subtitle}</p>
             )}
           </div>
           {action && <div>{action}</div>}
@@ -63,7 +63,7 @@ export function PanelLayout({
   positions,
 }: PanelLayoutProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-background p-4 md:p-6">
       {/* Desktop Layout: 3-column grid */}
       <div className="mx-auto max-w-[2000px] space-y-4">
         {/* Main Grid */}

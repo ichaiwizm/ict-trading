@@ -28,11 +28,11 @@ const ALERT_ICONS: Record<AlertType, React.ComponentType<{ className?: string }>
 };
 
 const ALERT_COLORS: Record<AlertType, string> = {
-  setup: "text-purple-400 bg-purple-500/10 border-purple-500/30",
-  price: "text-amber-400 bg-amber-500/10 border-amber-500/30",
-  killzone: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
-  entry: "text-red-400 bg-red-500/10 border-red-500/30",
-  info: "text-blue-400 bg-blue-500/10 border-blue-500/30",
+  setup: "text-purple-600 dark:text-purple-400 bg-purple-500/10 border-purple-500/30",
+  price: "text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/30",
+  killzone: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+  entry: "text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/30",
+  info: "text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-500/30",
 };
 
 export function AlertsPanel() {
@@ -64,7 +64,7 @@ export function AlertsPanel() {
       <div
         key={alert.id}
         className={`p-3 rounded-lg border cursor-pointer transition-all duration-200 hover:border-opacity-60 ${
-          alert.read ? "bg-white/5 border-white/10 opacity-60" : "bg-white/10 border-white/20"
+          alert.read ? "bg-secondary/50 border-border opacity-60" : "bg-secondary border-border/80"
         }`}
         onClick={() => !alert.read && markAsRead(alert.id)}
       >
@@ -74,14 +74,14 @@ export function AlertsPanel() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2 mb-1">
-              <h4 className="text-sm font-semibold text-gray-200 truncate">{alert.title}</h4>
+              <h4 className="text-sm font-semibold text-foreground truncate">{alert.title}</h4>
               {!alert.read && (
-                <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse shadow-[0_0_6px_rgba(168,85,247,0.8)] flex-shrink-0" />
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_6px_var(--primary)] flex-shrink-0" />
               )}
             </div>
-            <p className="text-xs text-gray-400 mb-2 line-clamp-2">{alert.message}</p>
+            <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{alert.message}</p>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500 font-mono">{formatTimestamp(alert.timestamp)}</span>
+              <span className="text-xs text-muted-foreground/70 font-mono">{formatTimestamp(alert.timestamp)}</span>
               <Badge variant="outline" className={`text-xs ${colorClass}`}>
                 {alert.type.toUpperCase()}
               </Badge>
@@ -93,15 +93,15 @@ export function AlertsPanel() {
   };
 
   return (
-    <Card className="bg-[#0a0a0f]/95 border-white/10 shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
+    <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CardTitle className="text-sm font-semibold tracking-wider text-purple-400">
+            <CardTitle className="text-sm font-semibold tracking-wider text-purple-600 dark:text-purple-400">
               ALERTS
             </CardTitle>
             {unreadCount > 0 && (
-              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-xs">
+              <Badge className="bg-purple-500/20 text-purple-600 dark:text-purple-400 border-purple-500/30 text-xs">
                 {unreadCount}
               </Badge>
             )}
@@ -111,12 +111,12 @@ export function AlertsPanel() {
               variant="ghost"
               size="sm"
               onClick={toggleSound}
-              className="h-8 w-8 p-0 hover:bg-white/10"
+              className="h-8 w-8 p-0 hover:bg-accent"
             >
               {soundEnabled ? (
-                <Bell className="w-4 h-4 text-purple-400" />
+                <Bell className="w-4 h-4 text-purple-600 dark:text-purple-400" />
               ) : (
-                <BellOff className="w-4 h-4 text-gray-500" />
+                <BellOff className="w-4 h-4 text-muted-foreground" />
               )}
             </Button>
             {alerts.length > 0 && (
@@ -124,9 +124,9 @@ export function AlertsPanel() {
                 variant="ghost"
                 size="sm"
                 onClick={clearAlerts}
-                className="h-8 w-8 p-0 hover:bg-white/10"
+                className="h-8 w-8 p-0 hover:bg-accent"
               >
-                <Trash2 className="w-4 h-4 text-red-400" />
+                <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
               </Button>
             )}
           </div>
@@ -135,9 +135,9 @@ export function AlertsPanel() {
       <CardContent>
         {alerts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <Bell className="w-12 h-12 text-gray-600 mb-3" />
-            <p className="text-sm text-gray-500">No alerts yet</p>
-            <p className="text-xs text-gray-600 mt-1">You'll be notified of important events</p>
+            <Bell className="w-12 h-12 text-muted-foreground/50 mb-3" />
+            <p className="text-sm text-muted-foreground">No alerts yet</p>
+            <p className="text-xs text-muted-foreground/70 mt-1">You'll be notified of important events</p>
           </div>
         ) : (
           <ScrollArea className="h-[400px] pr-4">

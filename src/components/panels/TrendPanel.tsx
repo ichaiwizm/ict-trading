@@ -29,9 +29,9 @@ export function TrendPanel() {
 
   const getBiasColor = () => {
     const bias = getBiasText();
-    if (bias === "LONGS ONLY") return "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
-    if (bias === "SHORTS ONLY") return "bg-red-500/20 text-red-400 border-red-500/30";
-    return "bg-amber-500/20 text-amber-400 border-amber-500/30";
+    if (bias === "LONGS ONLY") return "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30";
+    if (bias === "SHORTS ONLY") return "bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/30";
+    return "bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30";
   };
 
   const renderDirection = (direction: string, label: string) => {
@@ -39,19 +39,19 @@ export function TrendPanel() {
     const isRanging = direction === "ranging";
 
     return (
-      <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/5 border border-white/10">
-        <span className="text-sm text-gray-400 font-mono">{label}</span>
+      <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-secondary/50 border border-border/50">
+        <span className="text-sm text-muted-foreground font-mono">{label}</span>
         <div className="flex items-center gap-2">
           {isRanging ? (
-            <span className="text-amber-400 font-mono text-sm">RANGING</span>
+            <span className="text-amber-600 dark:text-amber-400 font-mono text-sm">RANGING</span>
           ) : (
             <>
               {isBullish ? (
-                <TrendingUp className="w-4 h-4 text-emerald-400" />
+                <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               ) : (
-                <TrendingDown className="w-4 h-4 text-red-400" />
+                <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
               )}
-              <span className={`font-mono text-sm ${isBullish ? "text-emerald-400" : "text-red-400"}`}>
+              <span className={`font-mono text-sm ${isBullish ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
                 {isBullish ? "BULLISH" : "BEARISH"}
               </span>
             </>
@@ -65,10 +65,10 @@ export function TrendPanel() {
     const isBullish = sb.direction === "bullish";
     return (
       <div key={sb.time} className="flex items-center gap-2 py-1.5">
-        <Badge variant="outline" className={`text-xs ${isBullish ? "border-emerald-500/30 text-emerald-400" : "border-red-500/30 text-red-400"}`}>
+        <Badge variant="outline" className={`text-xs ${isBullish ? "border-emerald-500/30 text-emerald-600 dark:text-emerald-400" : "border-red-500/30 text-red-600 dark:text-red-400"}`}>
           {sb.type.toUpperCase()}
         </Badge>
-        <span className="text-xs text-gray-500 font-mono">
+        <span className="text-xs text-muted-foreground font-mono">
           ${sb.price.toFixed(2)}
         </span>
       </div>
@@ -76,9 +76,9 @@ export function TrendPanel() {
   };
 
   return (
-    <Card className="bg-[#0a0a0f]/95 border-white/10 shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
+    <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-semibold tracking-wider text-purple-400">
+        <CardTitle className="text-sm font-semibold tracking-wider text-purple-600 dark:text-purple-400">
           TREND ANALYSIS
         </CardTitle>
       </CardHeader>
@@ -94,10 +94,10 @@ export function TrendPanel() {
 
         <div className="space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-500 uppercase tracking-wide">Strength</span>
-            <span className="text-xs font-mono text-purple-400">{currentTrend.strength}%</span>
+            <span className="text-xs text-muted-foreground uppercase tracking-wide">Strength</span>
+            <span className="text-xs font-mono text-purple-600 dark:text-purple-400">{currentTrend.strength}%</span>
           </div>
-          <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-2 bg-secondary rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(139,92,246,0.5)]"
               style={{ width: `${currentTrend.strength}%` }}
@@ -107,7 +107,7 @@ export function TrendPanel() {
 
         {currentTrend.structureBreaks.length > 0 && (
           <div className="pt-2 space-y-1">
-            <span className="text-xs text-gray-500 uppercase tracking-wide">Recent Breaks</span>
+            <span className="text-xs text-muted-foreground uppercase tracking-wide">Recent Breaks</span>
             <div className="space-y-1 max-h-32 overflow-y-auto">
               {currentTrend.structureBreaks.slice(0, 5).map(formatStructureBreak)}
             </div>
