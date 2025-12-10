@@ -101,8 +101,8 @@ export function PositionsPanel() {
       </CardHeader>
 
       <CardContent className="p-0">
-        <ScrollArea className="max-h-[200px] sm:max-h-[240px] lg:max-h-[300px]">
-          <div className="space-y-3 p-3 sm:p-4">
+        <ScrollArea className="max-h-[220px] sm:max-h-[280px] lg:max-h-[350px]">
+          <div className="space-y-2 p-2 sm:p-3">
             {positions.map((position) => (
               <PositionItem
                 key={position.id}
@@ -129,81 +129,95 @@ function PositionItem({ position, onClose, formatPrice }: PositionItemProps) {
   const isBuy = position.type === "buy";
 
   return (
-    <div className="p-3 sm:p-4 rounded-lg bg-secondary/50 border border-border space-y-2.5 sm:space-y-3">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {isBuy ? (
-            <TrendingUp className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-          ) : (
-            <TrendingDown className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
-          )}
-          <span className="font-mono text-sm font-medium text-foreground">
+    <div className={cn(
+      "group relative rounded-md border transition-all duration-200",
+      "bg-gradient-to-r from-secondary/40 to-secondary/20",
+      "hover:from-secondary/60 hover:to-secondary/40",
+      isBuy
+        ? "border-emerald-500/20 hover:border-emerald-500/40"
+        : "border-red-500/20 hover:border-red-500/40"
+    )}>
+      {/* Direction indicator bar */}
+      <div className={cn(
+        "absolute left-0 top-0 bottom-0 w-1 rounded-l-md",
+        isBuy ? "bg-emerald-500" : "bg-red-500"
+      )} />
+
+      {/* Main content - horizontal layout */}
+      <div className="pl-3 pr-2 py-2.5 flex items-center gap-3">
+        {/* Symbol & Type */}
+        <div className="flex items-center gap-2 min-w-[100px]">
+          <span className="font-mono text-sm font-semibold text-foreground tracking-tight">
             {position.symbol}
           </span>
-          <Badge
-            variant="outline"
-            className={cn(
-              "text-xs px-1.5 py-0",
-              isBuy
-                ? "border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
-                : "border-red-500/30 text-red-600 dark:text-red-400"
-            )}
-          >
-            {position.type.toUpperCase()}
-          </Badge>
+          <span className={cn(
+            "text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded",
+            isBuy
+              ? "bg-emerald-500/20 text-emerald-500"
+              : "bg-red-500/20 text-red-500"
+          )}>
+            {position.type}
+          </span>
         </div>
-        <span className="text-xs font-mono text-muted-foreground">
-          {position.volume.toFixed(2)} lots
-        </span>
+
+        {/* Volume */}
+        <div className="hidden sm:flex flex-col items-center min-w-[50px]">
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Vol</span>
+          <span className="font-mono text-xs font-medium text-foreground">
+            {position.volume.toFixed(2)}
+          </span>
+        </div>
+
+        {/* Entry → Current */}
+        <div className="flex-1 flex items-center justify-center gap-1.5 min-w-0">
+          <span className="font-mono text-xs text-muted-foreground truncate">
+            {formatPrice(position.openPrice, position.symbol)}
+          </span>
+          <span className="text-muted-foreground/40 text-xs">→</span>
+          <span className="font-mono text-xs font-medium text-foreground truncate">
+            {formatPrice(position.currentPrice, position.symbol)}
+          </span>
+        </div>
+
+        {/* P/L */}
+        <div className={cn(
+          "font-mono text-sm font-bold min-w-[70px] text-right",
+          isProfit ? "text-emerald-500" : "text-red-500"
+        )}>
+          {isProfit ? "+" : ""}{position.profit.toFixed(2)}
+        </div>
+
+        {/* Close button */}
+        <button
+          onClick={() => onClose(position.id)}
+          className={cn(
+            "p-1.5 rounded transition-all duration-200",
+            "text-muted-foreground/50 hover:text-red-500",
+            "hover:bg-red-500/10",
+            "opacity-50 group-hover:opacity-100"
+          )}
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
       </div>
 
-      {/* Prices */}
-      <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-        <span className="text-muted-foreground">Entry:</span>
-        <span className="font-mono text-muted-foreground">
-          {formatPrice(position.openPrice, position.symbol)}
-        </span>
-        <span className="text-muted-foreground/50">→</span>
-        <span className="font-mono text-foreground">
-          {formatPrice(position.currentPrice, position.symbol)}
-        </span>
-      </div>
-
-      {/* SL/TP */}
+      {/* SL/TP row - only if set */}
       {(position.stopLoss || position.takeProfit) && (
-        <div className="flex gap-3 text-xs">
+        <div className="pl-3 pr-2 pb-2 flex items-center gap-4 text-[10px]">
           {position.stopLoss && (
-            <span className="text-muted-foreground">
-              SL: <span className="font-mono text-red-600 dark:text-red-400">{formatPrice(position.stopLoss, position.symbol)}</span>
-            </span>
+            <div className="flex items-center gap-1">
+              <span className="text-red-500/60 uppercase tracking-wider">SL</span>
+              <span className="font-mono text-red-500">{formatPrice(position.stopLoss, position.symbol)}</span>
+            </div>
           )}
           {position.takeProfit && (
-            <span className="text-muted-foreground">
-              TP: <span className="font-mono text-emerald-600 dark:text-emerald-400">{formatPrice(position.takeProfit, position.symbol)}</span>
-            </span>
+            <div className="flex items-center gap-1">
+              <span className="text-emerald-500/60 uppercase tracking-wider">TP</span>
+              <span className="font-mono text-emerald-500">{formatPrice(position.takeProfit, position.symbol)}</span>
+            </div>
           )}
         </div>
       )}
-
-      {/* P/L and Close */}
-      <div className="flex items-center justify-between pt-1 border-t border-border">
-        <span className={cn(
-          "font-mono text-sm font-bold",
-          isProfit ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
-        )}>
-          {isProfit ? "+" : ""}${position.profit.toFixed(2)}
-        </span>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => onClose(position.id)}
-          className="h-7 px-2 text-xs hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-400"
-        >
-          <X className="h-3 w-3 mr-1" />
-          Close
-        </Button>
-      </div>
     </div>
   );
 }
