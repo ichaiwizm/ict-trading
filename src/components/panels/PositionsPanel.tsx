@@ -101,8 +101,8 @@ export function PositionsPanel() {
       </CardHeader>
 
       <CardContent className="p-0">
-        <ScrollArea className="max-h-[250px]">
-          <div className="space-y-2 p-3">
+        <ScrollArea className="max-h-[200px] sm:max-h-[240px] lg:max-h-[300px]">
+          <div className="space-y-3 p-3 sm:p-4">
             {positions.map((position) => (
               <PositionItem
                 key={position.id}
@@ -129,7 +129,7 @@ function PositionItem({ position, onClose, formatPrice }: PositionItemProps) {
   const isBuy = position.type === "buy";
 
   return (
-    <div className="p-3 rounded-lg bg-secondary/50 border border-border space-y-2">
+    <div className="p-3 sm:p-4 rounded-lg bg-secondary/50 border border-border space-y-2.5 sm:space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -159,7 +159,7 @@ function PositionItem({ position, onClose, formatPrice }: PositionItemProps) {
       </div>
 
       {/* Prices */}
-      <div className="flex items-center gap-2 text-xs">
+      <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
         <span className="text-muted-foreground">Entry:</span>
         <span className="font-mono text-muted-foreground">
           {formatPrice(position.openPrice, position.symbol)}

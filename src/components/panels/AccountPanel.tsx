@@ -55,13 +55,13 @@ export function AccountPanel() {
 
       <CardContent className="space-y-4">
         {/* Balance & Equity */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="p-3 rounded-lg bg-secondary/50 border border-border/50">
             <div className="flex items-center gap-2 mb-1">
               <Wallet className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" />
               <span className="text-xs text-muted-foreground uppercase">Balance</span>
             </div>
-            <span className="text-lg font-bold font-mono text-foreground">
+            <span className="text-base sm:text-lg font-bold font-mono text-foreground">
               ${formatCurrency(accountInfo?.balance)}
             </span>
           </div>
@@ -70,7 +70,7 @@ export function AccountPanel() {
               <DollarSign className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" />
               <span className="text-xs text-muted-foreground uppercase">Equity</span>
             </div>
-            <span className="text-lg font-bold font-mono text-foreground">
+            <span className="text-base sm:text-lg font-bold font-mono text-foreground">
               ${formatCurrency(accountInfo?.equity)}
             </span>
           </div>

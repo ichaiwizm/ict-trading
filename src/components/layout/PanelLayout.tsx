@@ -67,10 +67,10 @@ export function PanelLayout({
       {/* Desktop Layout: 3-column grid */}
       <div className="mx-auto max-w-[2000px] space-y-4">
         {/* Main Grid */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-3">
           {/* Left Column - Chart (spans 2 columns on desktop) */}
           <div className="lg:col-span-2 space-y-4">
-            <Panel className="h-[500px] lg:h-[600px]">
+            <Panel className="min-h-[400px] h-[50vh] sm:h-[55vh] lg:h-[600px] max-h-[700px]">
               {chart}
             </Panel>
             {/* Positions Panel - Below chart */}
@@ -97,7 +97,7 @@ export function PanelLayout({
         </div>
 
         {/* Bottom Row - Trading Tools */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {/* Lot Calculator */}
           <Panel title="Lot Calculator" subtitle="Risk management">
             {calculator}

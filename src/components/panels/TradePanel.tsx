@@ -119,7 +119,7 @@ export function TradePanel() {
 
       <CardContent className="space-y-4">
         {/* Current Prices */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <button
             onClick={() => setOrderType("sell")}
             className={`p-3 rounded-lg border transition-all ${
@@ -194,7 +194,7 @@ export function TradePanel() {
         </div>
 
         {/* SL/TP */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-2">
             <label className="text-xs text-muted-foreground flex items-center gap-1">
               <ShieldAlert className="h-3 w-3 text-red-500" />
