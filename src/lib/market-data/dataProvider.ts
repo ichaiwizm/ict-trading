@@ -33,8 +33,11 @@ class MarketDataProvider {
   constructor() {
     const apiKey = process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_KEY;
 
+    console.log('[DataProvider] Initializing...');
+    console.log('[DataProvider] API Key present:', !!apiKey);
+
     if (!apiKey) {
-      console.warn('NEXT_PUBLIC_ALPHA_VANTAGE_API_KEY not set');
+      console.warn('[DataProvider] NEXT_PUBLIC_ALPHA_VANTAGE_API_KEY not set');
     }
 
     this.config = { source: 'alphavantage', apiKey };
@@ -151,14 +154,20 @@ class MarketDataProvider {
       url += `&interval=${interval}`;
     }
 
+    console.log(`[DataProvider] Fetching from Alpha Vantage: ${func} ${fromSymbol}/${toSymbol} ${interval}`);
+
     const response = await fetch(url);
     const data = await response.json();
 
+    console.log('[DataProvider] Alpha Vantage response keys:', Object.keys(data));
+
     if (data['Error Message']) {
+      console.error('[DataProvider] Alpha Vantage error:', data['Error Message']);
       throw new Error(`Alpha Vantage error: ${data['Error Message']}`);
     }
 
     if (data['Note']) {
+      console.error('[DataProvider] Alpha Vantage rate limit:', data['Note']);
       throw new Error('Alpha Vantage rate limit exceeded. Please wait and try again.');
     }
 
@@ -169,10 +178,12 @@ class MarketDataProvider {
     const timeSeries = data[timeSeriesKey];
 
     if (!timeSeries) {
+      console.error('[DataProvider] No time series found. Expected key:', timeSeriesKey);
+      console.error('[DataProvider] Available keys:', Object.keys(data));
       throw new Error('No data returned from Alpha Vantage');
     }
 
-    return Object.entries(timeSeries)
+    const candles = Object.entries(timeSeries)
       .slice(0, limit)
       .map(([time, values]: [string, any]) => ({
         time: new Date(time).getTime() / 1000,
@@ -182,6 +193,9 @@ class MarketDataProvider {
         close: parseFloat(values['4. close']),
       }))
       .reverse();
+
+    console.log(`[DataProvider] Parsed ${candles.length} candles`);
+    return candles;
   }
 
   private async fetchTwelveData(

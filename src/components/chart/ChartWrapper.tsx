@@ -1,15 +1,20 @@
 'use client';
 
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 import { useMarketStore, useICTStore } from '@/stores';
 import { ChartContainer, ChartContainerRef } from './ChartContainer';
 import ChartToolbar from './ChartToolbar';
 import { LineStyle } from 'lightweight-charts';
 
 export function ChartWrapper() {
+  const [mounted, setMounted] = useState(false);
   const { symbol, timeframe, candles, bid, ask, currentPrice, setSymbol, setTimeframe } = useMarketStore();
   const { orderBlocks, fairValueGaps, fibonacci, confluenceZones } = useICTStore();
   const currentCandles = candles[timeframe] || [];
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const chartRef = useRef<ChartContainerRef>(null);
   const priceLinesRef = useRef<Map<string, any>>(new Map());
@@ -209,14 +214,29 @@ export function ChartWrapper() {
     };
   }, [clearOverlays]);
 
+  // Show skeleton until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="flex flex-col h-full bg-card rounded-xl overflow-hidden border border-border/50">
+        <div className="h-16 bg-card/80 border-b border-border animate-pulse" />
+        <div className="flex-1 min-h-[400px] flex items-center justify-center">
+          <div className="text-center space-y-3">
+            <div className="w-12 h-12 border-4 border-border border-t-primary rounded-full animate-spin mx-auto" />
+            <p className="text-sm text-muted-foreground font-mono">Initializing...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full bg-card rounded-xl overflow-hidden border border-border/50">
       <ChartToolbar
         symbol={symbol}
         timeframe={timeframe}
-        currentPrice={currentPrice}
-        bid={bid}
-        ask={ask}
+        currentPrice={currentPrice || undefined}
+        bid={bid || undefined}
+        ask={ask || undefined}
         priceChange={0}
         onSymbolChange={(s) => setSymbol(s as 'EURUSD' | 'XAUUSD')}
         onTimeframeChange={setTimeframe}
