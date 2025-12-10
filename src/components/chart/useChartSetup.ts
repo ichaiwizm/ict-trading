@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useTheme } from 'next-themes';
 import {
   createChart,
@@ -159,7 +159,7 @@ export function useChartSetup(
     };
   }, [containerRef, options.width, options.height, resolvedTheme, colors]);
 
-  const updateCandles = (candles: Candle[]) => {
+  const updateCandles = useCallback((candles: Candle[]) => {
     if (!candleSeriesRef.current || !isReady) return;
 
     const chartData = candles.map((candle) => ({
@@ -171,12 +171,12 @@ export function useChartSetup(
     }));
 
     candleSeriesRef.current.setData(chartData);
-  };
+  }, [isReady]);
 
-  const clearChart = () => {
+  const clearChart = useCallback(() => {
     if (!candleSeriesRef.current) return;
     candleSeriesRef.current.setData([]);
-  };
+  }, []);
 
   return {
     chart: chartRef.current,

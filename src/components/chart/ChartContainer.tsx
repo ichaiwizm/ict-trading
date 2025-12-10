@@ -35,14 +35,14 @@ const ChartContainer = forwardRef<ChartContainerRef, ChartContainerProps>(
       updateCandles,
     }));
 
-    // Update candles when they change
+    // Update candles when they change or when chart becomes ready
     useEffect(() => {
       if (candles.length > 0) {
         updateCandles(candles);
       } else {
         clearChart();
       }
-    }, [candles]);
+    }, [candles, updateCandles, clearChart]);
 
     return (
       <div className={cn('relative w-full h-full', className)}>
