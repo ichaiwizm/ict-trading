@@ -26,24 +26,19 @@ const initializeDemoData = () => {
   // Set initial symbol
   marketStore.setSymbol('EURUSD');
 
-  // Generate demo candles for multiple timeframes
-  // Map store timeframe names to generator format
-  const timeframeMap: Record<string, string> = {
-    'M15': '15m',
-    'H1': '1h',
-    'H4': '4h',
-  };
+  // Generate demo candles for all timeframes
+  const timeframes = ['1m', '5m', '15m', '1h', '4h', '1D'];
 
-  Object.entries(timeframeMap).forEach(([storeTf, genTf]) => {
-    const candles = generateDemoCandles('EURUSD', genTf, 200);
-    marketStore.setCandles(storeTf, candles);
+  timeframes.forEach((tf) => {
+    const candles = generateDemoCandles('EURUSD', tf, 200);
+    marketStore.setCandles(tf, candles);
   });
 
   // Set initial timeframe
-  marketStore.setTimeframe('M15');
+  marketStore.setTimeframe('15m');
 
   // Initialize live price from last candle
-  const m15Candles = marketStore.candles['M15'];
+  const m15Candles = marketStore.candles['15m'];
   const lastCandle = m15Candles?.[m15Candles.length - 1];
   const basePrice = lastCandle?.close || 1.08456;
   marketStore.updatePrice(basePrice, basePrice + 0.00002);
