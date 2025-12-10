@@ -36,9 +36,13 @@ export function useMarketData() {
     }
   }, [symbol, timeframe, setCandles, setLoading, setError]);
 
-  const refreshPrice = useCallback(() => {
-    const quote = marketDataProvider.getQuote(symbol);
-    updatePrice(quote.bid, quote.ask);
+  const refreshPrice = useCallback(async () => {
+    try {
+      const quote = await marketDataProvider.getQuote(symbol);
+      updatePrice(quote.bid, quote.ask);
+    } catch (err) {
+      console.error('Failed to refresh price:', err);
+    }
   }, [symbol, updatePrice]);
 
   // Fetch candles on symbol/timeframe change

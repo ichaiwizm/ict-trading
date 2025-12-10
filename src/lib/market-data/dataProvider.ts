@@ -1,7 +1,4 @@
-// Abstract data provider with demo mode support
-// Easily switch between demo, Alpha Vantage (free), and Twelve Data (paid)
-
-import { generateDemoCandles, getCurrentPrice } from './demoData';
+// Market data provider - Alpha Vantage only
 
 export interface Candle {
   time: number;
@@ -20,7 +17,7 @@ export interface Quote {
   timestamp: number;
 }
 
-export type DataSource = 'demo' | 'alphavantage' | 'twelvedata';
+export type DataSource = 'alphavantage' | 'twelvedata';
 
 interface DataProviderConfig {
   source: DataSource;
@@ -30,17 +27,17 @@ interface DataProviderConfig {
 class MarketDataProvider {
   private config: DataProviderConfig;
   private cache: Map<string, { data: Candle[]; timestamp: number }> = new Map();
+  private quoteCache: Map<string, { quote: Quote; timestamp: number }> = new Map();
   private cacheTimeout = 60000; // 1 minute
 
   constructor() {
-    // Use Alpha Vantage by default if API key is available
-    const apiKey = typeof window !== 'undefined'
-      ? process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_KEY
-      : process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_KEY;
 
-    this.config = apiKey
-      ? { source: 'alphavantage', apiKey }
-      : { source: 'demo' };
+    if (!apiKey) {
+      console.warn('NEXT_PUBLIC_ALPHA_VANTAGE_API_KEY not set');
+    }
+
+    this.config = { source: 'alphavantage', apiKey };
   }
 
   setConfig(config: DataProviderConfig) {
@@ -69,20 +66,68 @@ class MarketDataProvider {
         candles = await this.fetchTwelveData(symbol, timeframe, limit);
         break;
       default:
-        candles = generateDemoCandles(symbol, timeframe, limit);
+        throw new Error(`Unknown data source: ${this.config.source}`);
     }
 
     this.cache.set(cacheKey, { data: candles, timestamp: Date.now() });
     return candles;
   }
 
-  getQuote(symbol: 'EURUSD' | 'XAUUSD'): Quote {
-    const price = getCurrentPrice(symbol);
-    return {
-      symbol,
-      ...price,
-      timestamp: Date.now(),
-    };
+  async getQuote(symbol: 'EURUSD' | 'XAUUSD'): Promise<Quote> {
+    const cached = this.quoteCache.get(symbol);
+
+    // Quote cache is shorter - 10 seconds
+    if (cached && Date.now() - cached.timestamp < 10000) {
+      return cached.quote;
+    }
+
+    // Try to get quote from forex exchange rate endpoint
+    if (this.config.apiKey) {
+      try {
+        const fromSymbol = symbol.slice(0, 3);
+        const toSymbol = symbol.slice(3);
+        const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${fromSymbol}&to_currency=${toSymbol}&apikey=${this.config.apiKey}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        const rateData = data['Realtime Currency Exchange Rate'];
+        if (rateData) {
+          const rate = parseFloat(rateData['5. Exchange Rate']);
+          const spread = symbol === 'XAUUSD' ? 0.5 : 0.00015;
+
+          const quote: Quote = {
+            symbol,
+            bid: rate - spread / 2,
+            ask: rate + spread / 2,
+            spread,
+            timestamp: Date.now(),
+          };
+
+          this.quoteCache.set(symbol, { quote, timestamp: Date.now() });
+          return quote;
+        }
+      } catch (error) {
+        console.error('Failed to fetch quote:', error);
+      }
+    }
+
+    // Fallback to last candle price if quote fails
+    const candles = this.cache.get(`${symbol}_15m`);
+    if (candles && candles.data.length > 0) {
+      const lastCandle = candles.data[candles.data.length - 1];
+      const spread = symbol === 'XAUUSD' ? 0.5 : 0.00015;
+
+      return {
+        symbol,
+        bid: lastCandle.close - spread / 2,
+        ask: lastCandle.close + spread / 2,
+        spread,
+        timestamp: Date.now(),
+      };
+    }
+
+    throw new Error(`No quote data available for ${symbol}`);
   }
 
   private async fetchAlphaVantage(
@@ -91,37 +136,52 @@ class MarketDataProvider {
     limit: number
   ): Promise<Candle[]> {
     if (!this.config.apiKey) {
-      console.warn('Alpha Vantage API key not set, using demo data');
-      return generateDemoCandles(symbol as 'EURUSD' | 'XAUUSD', timeframe, limit);
+      throw new Error('Alpha Vantage API key not configured');
     }
 
-    // Alpha Vantage forex endpoint
+    const fromSymbol = symbol.slice(0, 3);
+    const toSymbol = symbol.slice(3);
     const interval = this.mapTimeframeToAV(timeframe);
-    const url = `https://www.alphavantage.co/query?function=FX_INTRADAY&from_symbol=${symbol.slice(0, 3)}&to_symbol=${symbol.slice(3)}&interval=${interval}&apikey=${this.config.apiKey}&outputsize=full`;
 
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
+    // Use daily endpoint for 1D timeframe
+    const func = timeframe === '1D' ? 'FX_DAILY' : 'FX_INTRADAY';
+    let url = `https://www.alphavantage.co/query?function=${func}&from_symbol=${fromSymbol}&to_symbol=${toSymbol}&apikey=${this.config.apiKey}&outputsize=full`;
 
-      if (data['Error Message'] || data['Note']) {
-        console.warn('Alpha Vantage error, using demo data');
-        return generateDemoCandles(symbol as 'EURUSD' | 'XAUUSD', timeframe, limit);
-      }
-
-      const timeSeries = data[`Time Series FX (${interval})`] || {};
-      return Object.entries(timeSeries)
-        .slice(0, limit)
-        .map(([time, values]: [string, any]) => ({
-          time: new Date(time).getTime() / 1000,
-          open: parseFloat(values['1. open']),
-          high: parseFloat(values['2. high']),
-          low: parseFloat(values['3. low']),
-          close: parseFloat(values['4. close']),
-        }))
-        .reverse();
-    } catch {
-      return generateDemoCandles(symbol as 'EURUSD' | 'XAUUSD', timeframe, limit);
+    if (func === 'FX_INTRADAY') {
+      url += `&interval=${interval}`;
     }
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data['Error Message']) {
+      throw new Error(`Alpha Vantage error: ${data['Error Message']}`);
+    }
+
+    if (data['Note']) {
+      throw new Error('Alpha Vantage rate limit exceeded. Please wait and try again.');
+    }
+
+    const timeSeriesKey = func === 'FX_DAILY'
+      ? 'Time Series FX (Daily)'
+      : `Time Series FX (${interval})`;
+
+    const timeSeries = data[timeSeriesKey];
+
+    if (!timeSeries) {
+      throw new Error('No data returned from Alpha Vantage');
+    }
+
+    return Object.entries(timeSeries)
+      .slice(0, limit)
+      .map(([time, values]: [string, any]) => ({
+        time: new Date(time).getTime() / 1000,
+        open: parseFloat(values['1. open']),
+        high: parseFloat(values['2. high']),
+        low: parseFloat(values['3. low']),
+        close: parseFloat(values['4. close']),
+      }))
+      .reverse();
   }
 
   private async fetchTwelveData(
@@ -130,49 +190,51 @@ class MarketDataProvider {
     limit: number
   ): Promise<Candle[]> {
     if (!this.config.apiKey) {
-      console.warn('Twelve Data API key not set, using demo data');
-      return generateDemoCandles(symbol as 'EURUSD' | 'XAUUSD', timeframe, limit);
+      throw new Error('Twelve Data API key not configured');
     }
 
     const interval = this.mapTimeframeToTD(timeframe);
     const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${interval}&outputsize=${limit}&apikey=${this.config.apiKey}`;
 
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
+    const response = await fetch(url);
+    const data = await response.json();
 
-      if (data.status === 'error') {
-        console.warn('Twelve Data error, using demo data');
-        return generateDemoCandles(symbol as 'EURUSD' | 'XAUUSD', timeframe, limit);
-      }
-
-      return (data.values || [])
-        .map((v: any) => ({
-          time: new Date(v.datetime).getTime() / 1000,
-          open: parseFloat(v.open),
-          high: parseFloat(v.high),
-          low: parseFloat(v.low),
-          close: parseFloat(v.close),
-          volume: parseInt(v.volume || '0'),
-        }))
-        .reverse();
-    } catch {
-      return generateDemoCandles(symbol as 'EURUSD' | 'XAUUSD', timeframe, limit);
+    if (data.status === 'error') {
+      throw new Error(`Twelve Data error: ${data.message}`);
     }
+
+    return (data.values || [])
+      .map((v: any) => ({
+        time: new Date(v.datetime).getTime() / 1000,
+        open: parseFloat(v.open),
+        high: parseFloat(v.high),
+        low: parseFloat(v.low),
+        close: parseFloat(v.close),
+        volume: parseInt(v.volume || '0'),
+      }))
+      .reverse();
   }
 
   private mapTimeframeToAV(tf: string): string {
     const map: Record<string, string> = {
-      '1m': '1min', '5m': '5min', '15m': '15min',
-      '1h': '60min', '4h': '60min', '1D': 'daily',
+      '1m': '1min',
+      '5m': '5min',
+      '15m': '15min',
+      '1h': '60min',
+      '4h': '60min', // Alpha Vantage doesn't support 4h, use 60min
+      '1D': 'daily',
     };
     return map[tf] || '15min';
   }
 
   private mapTimeframeToTD(tf: string): string {
     const map: Record<string, string> = {
-      '1m': '1min', '5m': '5min', '15m': '15min',
-      '1h': '1h', '4h': '4h', '1D': '1day',
+      '1m': '1min',
+      '5m': '5min',
+      '15m': '15min',
+      '1h': '1h',
+      '4h': '4h',
+      '1D': '1day',
     };
     return map[tf] || '15min';
   }
