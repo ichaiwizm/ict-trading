@@ -10,6 +10,7 @@ export interface Candle {
   low: number;
   close: number;
   volume?: number;
+  source?: string; // Data source attribution
 }
 
 export type SwingPointType = 'high' | 'low';
