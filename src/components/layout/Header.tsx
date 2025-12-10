@@ -8,10 +8,14 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export function Header() {
   const { symbol, bid, ask } = useMarketStore();
+  const [mounted, setMounted] = useState(false);
   const [isKillZoneActive, setIsKillZoneActive] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
   useEffect(() => {
+    setMounted(true);
+    setCurrentTime(new Date());
+
     const timer = setInterval(() => {
       setCurrentTime(new Date());
       // Check if current time is within any kill zone (NY: 7-10 AM ET, London: 2-5 AM ET)
@@ -57,7 +61,7 @@ export function Header() {
             <div>
               <div className="flex items-baseline gap-2">
                 <span className="font-mono text-2xl font-bold text-foreground">
-                  {bid.toFixed(5)}
+                  {mounted && bid > 0 ? bid.toFixed(5) : '-.-----'}
                 </span>
                 <span
                   className={cn(
@@ -65,14 +69,13 @@ export function Header() {
                     isPositive ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'
                   )}
                 >
-                  {isPositive ? '+' : ''}
-                  {priceChangePercent}%
+                  {mounted ? `${isPositive ? '+' : ''}${priceChangePercent}%` : '--.--'}
                 </span>
               </div>
               <div className="flex gap-3 text-xs text-muted-foreground">
-                <span>Bid: {bid.toFixed(5)}</span>
-                <span>Ask: {ask.toFixed(5)}</span>
-                <span>Spread: {(ask - bid).toFixed(5)}</span>
+                <span>Bid: {mounted && bid > 0 ? bid.toFixed(5) : '-.-----'}</span>
+                <span>Ask: {mounted && ask > 0 ? ask.toFixed(5) : '-.-----'}</span>
+                <span>Spread: {mounted && ask > 0 ? (ask - bid).toFixed(5) : '-.-----'}</span>
               </div>
             </div>
           </div>
@@ -112,7 +115,7 @@ export function Header() {
           {/* UTC Time */}
           <div className="hidden xl:flex items-center rounded-lg border border-border bg-card/50 px-3 py-2">
             <span className="font-mono text-xs text-muted-foreground">
-              {currentTime.toUTCString().slice(17, 25)} UTC
+              {currentTime ? currentTime.toUTCString().slice(17, 25) : '--:--:--'} UTC
             </span>
           </div>
         </div>

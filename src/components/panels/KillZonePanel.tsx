@@ -25,9 +25,13 @@ const DEFAULT_KILL_ZONES: KillZone[] = [
 export function KillZonePanel() {
   const storeKillZones = useICTStore((state) => state.killZones);
   const killZones = storeKillZones.length > 0 ? storeKillZones : DEFAULT_KILL_ZONES;
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [mounted, setMounted] = useState(false);
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
   useEffect(() => {
+    setMounted(true);
+    setCurrentTime(new Date());
+
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -42,42 +46,43 @@ export function KillZonePanel() {
   };
 
   const getTimeUntilZone = (startUTC: string): number => {
+    if (!currentTime) return 0;
     const [hours, minutes] = startUTC.split(":").map(Number);
-    const now = new Date();
-    const zoneStart = new Date(now);
+    const zoneStart = new Date(currentTime);
     zoneStart.setUTCHours(hours, minutes, 0, 0);
 
-    if (zoneStart < now) {
+    if (zoneStart < currentTime) {
       zoneStart.setDate(zoneStart.getDate() + 1);
     }
 
-    const diff = zoneStart.getTime() - now.getTime();
+    const diff = zoneStart.getTime() - currentTime.getTime();
     return Math.floor(diff / (1000 * 60));
   };
 
   const getZoneProgress = (zone: KillZone): number => {
-    if (!zone.isActive) return 0;
+    if (!zone.isActive || !currentTime) return 0;
 
     const [startHours, startMinutes] = zone.startUTC.split(":").map(Number);
     const [endHours, endMinutes] = zone.endUTC.split(":").map(Number);
 
-    const now = new Date();
-    const start = new Date(now);
+    const start = new Date(currentTime);
     start.setUTCHours(startHours, startMinutes, 0, 0);
-    const end = new Date(now);
+    const end = new Date(currentTime);
     end.setUTCHours(endHours, endMinutes, 0, 0);
 
     const total = end.getTime() - start.getTime();
-    const elapsed = now.getTime() - start.getTime();
+    const elapsed = currentTime.getTime() - start.getTime();
 
     return Math.min(100, Math.max(0, (elapsed / total) * 100));
   };
 
   const renderZone = (zone: KillZone) => {
     const progress = getZoneProgress(zone);
-    const timeInfo = zone.isActive
-      ? `${zone.timeRemaining || 0}m remaining`
-      : `in ${getTimeUntilZone(zone.startUTC)}m`;
+    const timeInfo = !mounted
+      ? 'Loading...'
+      : zone.isActive
+        ? `${zone.timeRemaining || 0}m remaining`
+        : `in ${getTimeUntilZone(zone.startUTC)}m`;
 
     return (
       <div
