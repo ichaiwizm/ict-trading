@@ -8,6 +8,7 @@ import { useICTStore } from "@/stores";
 
 export function TrendPanel() {
   const trend = useICTStore((state) => state.trend);
+  const isAnalyzing = useICTStore((state) => state.isAnalyzing);
 
   // Show loading state when no trend data
   if (!trend) {
@@ -21,7 +22,7 @@ export function TrendPanel() {
         <CardContent className="flex flex-col items-center justify-center py-8 gap-3">
           <Loader2 className="h-6 w-6 animate-spin text-purple-500/60" />
           <span className="text-sm text-muted-foreground font-mono">
-            Analyzing market structure...
+            {isAnalyzing ? "Analyzing market..." : "Waiting for data..."}
           </span>
           <span className="text-xs text-muted-foreground/60">
             Waiting for 1H & 4H data
@@ -31,7 +32,7 @@ export function TrendPanel() {
     );
   }
 
-  const currentTrend = trend;
+  const currentTrend: TrendAnalysis = trend;
   const getBiasText = () => {
     if (currentTrend.higherTimeframe === "bullish" && currentTrend.lowerTimeframe === "bullish") {
       return "LONGS ONLY";

@@ -87,11 +87,6 @@ const OANDA_INSTRUMENTS: Record<string, string> = {
   'NZDUSD': 'NZD_USD',
 };
 
-// Reverse mapping for display
-const INSTRUMENT_TO_SYMBOL: Record<string, string> = Object.fromEntries(
-  Object.entries(OANDA_INSTRUMENTS).map(([k, v]) => [v, k])
-);
-
 class MarketDataProvider {
   private config: DataProviderConfig;
   private cache: Map<string, { data: Candle[]; timestamp: number }> = new Map();

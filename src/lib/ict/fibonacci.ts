@@ -51,26 +51,27 @@ export function calculateFibonacci(
 }
 
 /**
- * Checks if price is in the optimal entry zone (0.618-0.786 for trend continuation)
+ * Checks if price is in the optimal entry zone for trend continuation
+ * - Longs: Discount zone (0.618-0.786 retracement from high)
+ * - Shorts: Premium zone (0.236-0.382 retracement from high)
  */
 export function isPriceInOptimalZone(
   price: number,
   fib: FibonacciZone,
   direction: 'long' | 'short'
 ): boolean {
-  const level618 = fib.levels.find(l => l.level === 0.618);
-  const level786 = fib.levels.find(l => l.level === 0.786);
-
-  if (!level618 || !level786) {
-    return false;
-  }
-
   if (direction === 'long') {
     // For long entries, we want price in discount zone (0.618-0.786 retracement)
+    const level618 = fib.levels.find(l => l.level === 0.618);
+    const level786 = fib.levels.find(l => l.level === 0.786);
+    if (!level618 || !level786) return false;
     return price >= level618.price && price <= level786.price;
   } else {
-    // For short entries, check if price is in premium zone
-    return price >= level618.price && price <= level786.price;
+    // For short entries, we want price in premium zone (0.236-0.382 retracement)
+    const level236 = fib.levels.find(l => l.level === 0.236);
+    const level382 = fib.levels.find(l => l.level === 0.382);
+    if (!level236 || !level382) return false;
+    return price >= level236.price && price <= level382.price;
   }
 }
 

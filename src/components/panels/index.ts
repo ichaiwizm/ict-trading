@@ -8,4 +8,4 @@ export type { Alert, AlertType } from "./AlertsPanel";
 export { LotCalculator } from "./LotCalculator";
 export { TradePanel } from "./TradePanel";
 export { AccountPanel } from "./AccountPanel";
-export { PositionCard } from "./PositionCard";
+export { PositionsPanel } from "./PositionsPanel";
