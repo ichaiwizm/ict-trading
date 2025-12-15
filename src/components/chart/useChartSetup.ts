@@ -247,15 +247,18 @@ export function useChartSetup(
       // Update only the last candle - preserves zoom/pan state
       candleSeriesRef.current.update(chartData[chartData.length - 1]);
     } else {
-      // New dataset or new candles added
-      candleSeriesRef.current.setData(chartData);
-
-      // Update current timeframe for zoom persistence
+      // IMPORTANT: Update timeframe BEFORE setData() to prevent
+      // subscribeVisibleLogicalRangeChange from saving zoom to wrong timeframe
       currentTimeframeRef.current = timeframe;
 
-      // Try to restore saved zoom, otherwise fitContent
+      // Load saved zoom BEFORE setData
+      const savedZoom = loadZoom(timeframe);
+
+      // Now safe to call setData
+      candleSeriesRef.current.setData(chartData);
+
+      // Restore zoom or fitContent
       if (chartRef.current) {
-        const savedZoom = loadZoom(timeframe);
         if (savedZoom) {
           // Small delay to ensure data is rendered before setting zoom
           setTimeout(() => {
