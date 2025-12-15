@@ -59,8 +59,8 @@ export function useChartSetup(
   const [isReady, setIsReady] = useState(false);
   const { resolvedTheme } = useTheme();
 
-  // Track initial load to only fitContent once
-  const isInitialLoadRef = useRef(true);
+  // Track data changes to detect when fitContent is needed
+  const firstCandleTimeRef = useRef<number | null>(null);
   const lastCandleCountRef = useRef(0);
 
   // Memoize theme to avoid recreating chart on every render
@@ -208,21 +208,24 @@ export function useChartSetup(
       close: candle.close,
     }));
 
-    // Incremental update if only the last candle changed (same count)
-    if (lastCandleCountRef.current === candles.length && candles.length > 0) {
+    const firstCandleTime = candles.length > 0 ? candles[0].time : null;
+    const isNewDataset = firstCandleTimeRef.current !== firstCandleTime;
+
+    // Incremental update if same dataset and same candle count
+    if (!isNewDataset && lastCandleCountRef.current === candles.length && candles.length > 0) {
       // Update only the last candle - preserves zoom/pan state
       candleSeriesRef.current.update(chartData[chartData.length - 1]);
     } else {
-      // Initial load or new candles added
+      // New dataset or new candles added
       candleSeriesRef.current.setData(chartData);
 
-      // fitContent only on initial load
-      if (isInitialLoadRef.current && chartRef.current) {
+      // fitContent when it's a new dataset (timeframe/symbol change)
+      if (isNewDataset && chartRef.current) {
         chartRef.current.timeScale().fitContent();
-        isInitialLoadRef.current = false;
       }
     }
 
+    firstCandleTimeRef.current = firstCandleTime;
     lastCandleCountRef.current = candles.length;
   }, [isReady]);
 

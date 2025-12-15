@@ -58,6 +58,11 @@ const TIMEFRAME_GROUPS = [
   },
 ];
 
+// Format price with appropriate decimals (2 for gold, 5 for forex)
+const formatPrice = (price: number, sym: string) => {
+  return price.toFixed(sym === 'XAUUSD' ? 2 : 5);
+};
+
 export default function ChartToolbar({
   symbol,
   timeframe,
@@ -121,18 +126,18 @@ export default function ChartToolbar({
         <div className="flex items-center gap-6">
           {/* Bid/Ask Spread */}
           {bid && ask && (
-            <div className="flex items-center gap-4 px-4 py-2 bg-secondary border border-border rounded-lg">
-              <div className="text-center">
+            <div className="flex items-center gap-3 px-3 py-2 bg-secondary border border-border rounded-lg">
+              <div className="text-center min-w-[72px]">
                 <div className="text-[10px] text-muted-foreground uppercase font-mono">Bid</div>
-                <div className="text-sm font-mono text-red-600 dark:text-red-400 font-semibold">
-                  {bid.toFixed(5)}
+                <div className="text-sm font-mono text-red-500 font-semibold">
+                  {formatPrice(bid, symbol)}
                 </div>
               </div>
               <div className="w-px h-8 bg-border" />
-              <div className="text-center">
+              <div className="text-center min-w-[72px]">
                 <div className="text-[10px] text-muted-foreground uppercase font-mono">Ask</div>
-                <div className="text-sm font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
-                  {ask.toFixed(5)}
+                <div className="text-sm font-mono text-emerald-500 font-semibold">
+                  {formatPrice(ask, symbol)}
                 </div>
               </div>
             </div>
@@ -142,7 +147,7 @@ export default function ChartToolbar({
           <div className="flex items-center gap-3 px-4 py-2 bg-secondary border border-border rounded-lg">
             <div className="text-right">
               <div className="text-2xl font-mono font-bold text-foreground">
-                {currentPrice.toFixed(5)}
+                {formatPrice(currentPrice, symbol)}
               </div>
               <div
                 className={cn(

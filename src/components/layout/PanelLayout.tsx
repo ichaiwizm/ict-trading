@@ -61,57 +61,47 @@ export function PanelLayout({
   positions,
 }: PanelLayoutProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-background p-3 md:p-4">
-      {/* Desktop Layout: 3-column grid */}
-      <div className="mx-auto max-w-[2000px] space-y-3">
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 gap-3 md:gap-4 lg:grid-cols-3">
-          {/* Left Column - Chart (spans 2 columns on desktop) */}
-          <div className="lg:col-span-2 space-y-3">
-            <Panel noPadding className="min-h-[400px] h-[50vh] sm:h-[55vh] lg:h-[60vh]">
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-background p-2 md:p-3">
+      <div className="mx-auto max-w-[1800px]">
+        {/* Main 2-column grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-2 md:gap-3">
+
+          {/* Left Column - Chart & Bottom panels */}
+          <div className="space-y-2 md:space-y-3">
+            {/* Chart - takes most vertical space */}
+            <Panel noPadding className="h-[50vh] sm:h-[55vh] lg:h-[65vh]">
               {chart}
             </Panel>
-            {/* Positions Panel - Below chart */}
-            <Panel title="Open Positions" subtitle="Active trades">
-              {positions}
-            </Panel>
+
+            {/* Bottom panels in 2 columns */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
+              <Panel title="Open Positions" subtitle="Active trades">
+                {positions}
+              </Panel>
+              <Panel title="Lot Calculator" subtitle="Risk management">
+                {calculator}
+              </Panel>
+            </div>
           </div>
 
-          {/* Right Column - Analysis Panels */}
-          <div className="space-y-3 lg:flex lg:flex-col">
-            {/* Trend Panel */}
-            <Panel title="Market Trend" subtitle="Multi-timeframe bias" className="lg:flex-1">
+          {/* Right Column - fixed width sidebar */}
+          <div className="space-y-2 md:space-y-3">
+            <Panel title="Market Trend" subtitle="Multi-timeframe bias">
               {trend}
             </Panel>
-
-            {/* Kill Zones Panel */}
-            <Panel title="Kill Zones" subtitle="Optimal trading times" className="lg:flex-1">
+            <Panel title="Kill Zones" subtitle="Optimal trading times">
               {killZones}
             </Panel>
-
-            {/* Active Zones Panel */}
-            <Panel title="Active Zones" subtitle="Key price levels" className="lg:flex-1">
+            <Panel title="Active Zones" subtitle="Key price levels">
               {zones}
             </Panel>
+            <Panel title="Quick Trade" subtitle="Execute orders">
+              {trade}
+            </Panel>
+            <Panel title="Account & Alerts" subtitle="Status & notifications">
+              <AccountAlertsPanel />
+            </Panel>
           </div>
-        </div>
-
-        {/* Bottom Row - Trading Tools */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Lot Calculator */}
-          <Panel title="Lot Calculator" subtitle="Risk management">
-            {calculator}
-          </Panel>
-
-          {/* Trade Panel */}
-          <Panel title="Quick Trade" subtitle="Execute orders">
-            {trade}
-          </Panel>
-
-          {/* Account & Alerts Panel (Combined with Tabs) */}
-          <Panel title="Account & Alerts" subtitle="Status & notifications">
-            <AccountAlertsPanel />
-          </Panel>
         </div>
       </div>
 
