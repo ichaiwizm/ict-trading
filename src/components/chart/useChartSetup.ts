@@ -10,8 +10,29 @@ import {
   ColorType,
   CrosshairMode,
   CandlestickData,
+  LogicalRange,
 } from 'lightweight-charts';
 import { Candle } from '@/lib/ict/types';
+
+// Zoom persistence helpers
+const getZoomKey = (tf: string) => `chart-zoom-${tf}`;
+
+const saveZoom = (tf: string, range: LogicalRange | null) => {
+  if (typeof window === 'undefined') return;
+  if (range) {
+    localStorage.setItem(getZoomKey(tf), JSON.stringify(range));
+  }
+};
+
+const loadZoom = (tf: string): LogicalRange | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const saved = localStorage.getItem(getZoomKey(tf));
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+};
 
 interface ChartOptions {
   width?: number;
@@ -22,7 +43,7 @@ interface ChartOptions {
 interface ChartSetup {
   chart: IChartApi | null;
   candleSeries: ISeriesApi<'Candlestick'> | null;
-  updateCandles: (candles: Candle[]) => void;
+  updateCandles: (candles: Candle[], timeframe: string) => void;
   clearChart: () => void;
 }
 
@@ -62,6 +83,9 @@ export function useChartSetup(
   // Track data changes to detect when fitContent is needed
   const firstCandleTimeRef = useRef<number | null>(null);
   const lastCandleCountRef = useRef(0);
+
+  // Track current timeframe for zoom persistence
+  const currentTimeframeRef = useRef<string>('');
 
   // Memoize theme to avoid recreating chart on every render
   const theme = resolvedTheme === 'dark' ? 'dark' : 'light';
@@ -127,6 +151,13 @@ export function useChartSetup(
     chartRef.current = chart;
     candleSeriesRef.current = candleSeries;
     setIsReady(true);
+
+    // Subscribe to zoom/pan changes to persist them
+    chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
+      if (range && currentTimeframeRef.current) {
+        saveZoom(currentTimeframeRef.current, range);
+      }
+    });
 
     // Handle crosshair move
     if (options.onCrosshairMove) {
@@ -197,7 +228,7 @@ export function useChartSetup(
     });
   }, [colors]);
 
-  const updateCandles = useCallback((candles: Candle[]) => {
+  const updateCandles = useCallback((candles: Candle[], timeframe: string) => {
     if (!candleSeriesRef.current || !isReady) return;
 
     const chartData = candles.map((candle) => ({
@@ -219,9 +250,20 @@ export function useChartSetup(
       // New dataset or new candles added
       candleSeriesRef.current.setData(chartData);
 
-      // fitContent when it's a new dataset (timeframe/symbol change)
-      if (isNewDataset && chartRef.current) {
-        chartRef.current.timeScale().fitContent();
+      // Update current timeframe for zoom persistence
+      currentTimeframeRef.current = timeframe;
+
+      // Try to restore saved zoom, otherwise fitContent
+      if (chartRef.current) {
+        const savedZoom = loadZoom(timeframe);
+        if (savedZoom) {
+          // Small delay to ensure data is rendered before setting zoom
+          setTimeout(() => {
+            chartRef.current?.timeScale().setVisibleLogicalRange(savedZoom);
+          }, 10);
+        } else {
+          chartRef.current.timeScale().fitContent();
+        }
       }
     }
 

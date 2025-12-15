@@ -17,7 +17,7 @@ export interface ChartContainerProps {
 export interface ChartContainerRef {
   chart: IChartApi | null;
   candleSeries: ISeriesApi<'Candlestick'> | null;
-  updateCandles: (candles: Candle[]) => void;
+  updateCandles: (candles: Candle[], timeframe: string) => void;
 }
 
 const ChartContainer = forwardRef<ChartContainerRef, ChartContainerProps>(
@@ -38,11 +38,11 @@ const ChartContainer = forwardRef<ChartContainerRef, ChartContainerProps>(
     // Update candles when they change or when chart becomes ready
     useEffect(() => {
       if (candles.length > 0) {
-        updateCandles(candles);
+        updateCandles(candles, timeframe);
       } else {
         clearChart();
       }
-    }, [candles, updateCandles, clearChart]);
+    }, [candles, timeframe, updateCandles, clearChart]);
 
     return (
       <div className={cn('relative w-full h-full', className)}>
