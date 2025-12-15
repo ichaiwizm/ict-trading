@@ -59,6 +59,10 @@ export function useChartSetup(
   const [isReady, setIsReady] = useState(false);
   const { resolvedTheme } = useTheme();
 
+  // Track initial load to only fitContent once
+  const isInitialLoadRef = useRef(true);
+  const lastCandleCountRef = useRef(0);
+
   // Memoize theme to avoid recreating chart on every render
   const theme = resolvedTheme === 'dark' ? 'dark' : 'light';
   const colors = useMemo(() => chartThemes[theme], [theme]);
@@ -204,12 +208,22 @@ export function useChartSetup(
       close: candle.close,
     }));
 
-    candleSeriesRef.current.setData(chartData);
-    
-    // Fit content to view
-    if (chartRef.current) {
-      chartRef.current.timeScale().fitContent();
+    // Incremental update if only the last candle changed (same count)
+    if (lastCandleCountRef.current === candles.length && candles.length > 0) {
+      // Update only the last candle - preserves zoom/pan state
+      candleSeriesRef.current.update(chartData[chartData.length - 1]);
+    } else {
+      // Initial load or new candles added
+      candleSeriesRef.current.setData(chartData);
+
+      // fitContent only on initial load
+      if (isInitialLoadRef.current && chartRef.current) {
+        chartRef.current.timeScale().fitContent();
+        isInitialLoadRef.current = false;
+      }
     }
+
+    lastCandleCountRef.current = candles.length;
   }, [isReady]);
 
   const clearChart = useCallback(() => {

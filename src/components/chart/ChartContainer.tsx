@@ -62,7 +62,7 @@ const ChartContainer = forwardRef<ChartContainerRef, ChartContainerProps>(
         {/* Chart Container */}
         <div
           ref={containerRef}
-          className="w-full h-full rounded-lg overflow-hidden border border-border shadow-2xl"
+          className="w-full h-full"
         />
 
         {/* Loading State */}

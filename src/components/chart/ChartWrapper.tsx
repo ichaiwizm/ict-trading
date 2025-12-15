@@ -217,7 +217,7 @@ export function ChartWrapper() {
   // Show skeleton until mounted to avoid hydration mismatch
   if (!mounted) {
     return (
-      <div className="flex flex-col h-full bg-card rounded-xl overflow-hidden border border-border/50">
+      <div className="flex flex-col h-full overflow-hidden">
         <div className="h-16 bg-card/80 border-b border-border animate-pulse" />
         <div className="flex-1 min-h-[400px] flex items-center justify-center">
           <div className="text-center space-y-3">
@@ -230,7 +230,7 @@ export function ChartWrapper() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-card rounded-xl overflow-hidden border border-border/50">
+    <div className="flex flex-col h-full overflow-hidden">
       <ChartToolbar
         symbol={symbol}
         timeframe={timeframe}

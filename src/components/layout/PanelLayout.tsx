@@ -61,14 +61,14 @@ export function PanelLayout({
   positions,
 }: PanelLayoutProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-background p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-background p-3 md:p-4">
       {/* Desktop Layout: 3-column grid */}
-      <div className="mx-auto max-w-[2000px] space-y-4">
+      <div className="mx-auto max-w-[2000px] space-y-3">
         {/* Main Grid */}
-        <div className="grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 md:gap-4 lg:grid-cols-3">
           {/* Left Column - Chart (spans 2 columns on desktop) */}
-          <div className="lg:col-span-2 space-y-4">
-            <Panel className="min-h-[400px] h-[50vh] sm:h-[55vh] lg:h-[600px] max-h-[700px]">
+          <div className="lg:col-span-2 space-y-3">
+            <Panel noPadding className="min-h-[400px] h-[50vh] sm:h-[55vh] lg:h-[60vh]">
               {chart}
             </Panel>
             {/* Positions Panel - Below chart */}
@@ -78,26 +78,26 @@ export function PanelLayout({
           </div>
 
           {/* Right Column - Analysis Panels */}
-          <div className="space-y-4">
+          <div className="space-y-3 lg:flex lg:flex-col">
             {/* Trend Panel */}
-            <Panel title="Market Trend" subtitle="Multi-timeframe bias">
+            <Panel title="Market Trend" subtitle="Multi-timeframe bias" className="lg:flex-1">
               {trend}
             </Panel>
 
             {/* Kill Zones Panel */}
-            <Panel title="Kill Zones" subtitle="Optimal trading times">
+            <Panel title="Kill Zones" subtitle="Optimal trading times" className="lg:flex-1">
               {killZones}
             </Panel>
 
             {/* Active Zones Panel */}
-            <Panel title="Active Zones" subtitle="Key price levels">
+            <Panel title="Active Zones" subtitle="Key price levels" className="lg:flex-1">
               {zones}
             </Panel>
           </div>
         </div>
 
         {/* Bottom Row - Trading Tools */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {/* Lot Calculator */}
           <Panel title="Lot Calculator" subtitle="Risk management">
             {calculator}
