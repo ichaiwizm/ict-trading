@@ -104,7 +104,7 @@ export function PositionsPanel() {
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="p-1 rounded hover:bg-amber-500/20 text-muted-foreground hover:text-amber-500 transition-colors"
-                title="Agrandir"
+                title="Expand"
               >
                 <Maximize2 className="h-4 w-4" />
               </button>

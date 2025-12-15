@@ -32,9 +32,10 @@ export function Header() {
     return () => clearInterval(timer);
   }, []);
 
-  const priceChange = bid - ask;
-  const priceChangePercent = ask > 0 ? ((priceChange / ask) * 100).toFixed(2) : '0.00';
-  const isPositive = priceChange >= 0;
+  // Calculate spread in pips (EURUSD: 0.0001 = 1 pip, XAUUSD: 0.1 = 1 pip)
+  const spread = ask - bid;
+  const pipMultiplier = symbol === 'XAUUSD' ? 10 : 10000;
+  const spreadPips = spread * pipMultiplier;
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -66,21 +67,15 @@ export function Header() {
             <div>
               <div className="flex items-baseline gap-2">
                 <span className="font-mono text-2xl font-bold text-foreground">
-                  {mounted && bid > 0 ? bid.toFixed(5) : '-.-----'}
+                  {mounted && bid > 0 ? bid.toFixed(symbol === 'XAUUSD' ? 2 : 5) : '-.-----'}
                 </span>
-                <span
-                  className={cn(
-                    'font-mono text-sm',
-                    isPositive ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'
-                  )}
-                >
-                  {mounted ? `${isPositive ? '+' : ''}${priceChangePercent}%` : '--.--'}
+                <span className="font-mono text-sm text-muted-foreground">
+                  {mounted && spreadPips > 0 ? `${spreadPips.toFixed(1)} pips` : '-- pips'}
                 </span>
               </div>
               <div className="flex gap-3 text-xs text-muted-foreground">
-                <span>Bid: {mounted && bid > 0 ? bid.toFixed(5) : '-.-----'}</span>
-                <span>Ask: {mounted && ask > 0 ? ask.toFixed(5) : '-.-----'}</span>
-                <span>Spread: {mounted && ask > 0 ? (ask - bid).toFixed(5) : '-.-----'}</span>
+                <span>Bid: {mounted && bid > 0 ? bid.toFixed(symbol === 'XAUUSD' ? 2 : 5) : '-.-----'}</span>
+                <span>Ask: {mounted && ask > 0 ? ask.toFixed(symbol === 'XAUUSD' ? 2 : 5) : '-.-----'}</span>
               </div>
             </div>
           </div>
@@ -107,10 +102,10 @@ export function Header() {
           </div>
 
           {/* Data Source */}
-          <div className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2">
-            <div className="h-2 w-2 rounded-full bg-amber-500" />
-            <span className="hidden sm:inline font-mono text-xs text-amber-600 dark:text-amber-400">
-              Data: 15min delay
+          <div className="flex items-center gap-2 rounded-lg border border-green-500/30 bg-green-500/10 px-3 py-2">
+            <div className="h-2 w-2 rounded-full bg-green-500" />
+            <span className="hidden sm:inline font-mono text-xs text-green-600 dark:text-green-400">
+              OANDA Live
             </span>
           </div>
 

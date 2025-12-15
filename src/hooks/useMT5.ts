@@ -21,6 +21,7 @@ export function useMT5() {
     setAccountId,
     setAccountInfo,
     setPositions,
+    setPendingOrders,
     setPlacingOrder,
     setLastOrderResult,
     disconnect: storeDisconnect,
@@ -59,8 +60,14 @@ export function useMT5() {
     [setConnecting, setConnectionError, setAccountId, setConnected]
   );
 
-  const disconnect = useCallback(() => {
-    storeDisconnect();
+  const disconnect = useCallback(async () => {
+    try {
+      await fetch('/api/mt5/connect', { method: 'DELETE' });
+    } catch (error) {
+      console.error('Failed to disconnect from MT5:', error);
+    } finally {
+      storeDisconnect();
+    }
   }, [storeDisconnect]);
 
   const refreshAccount = useCallback(async () => {
@@ -68,16 +75,17 @@ export function useMT5() {
 
     try {
       const response = await fetch('/api/mt5/account');
-      const data = await response.json();
+      const json = await response.json();
 
-      if (response.ok) {
-        setAccountInfo(data.accountInfo);
-        setPositions(data.positions || []);
+      if (response.ok && json.success && json.data) {
+        setAccountInfo(json.data.accountInfo);
+        setPositions(json.data.positions || []);
+        setPendingOrders(json.data.pendingOrders || []);
       }
     } catch (error) {
       console.error('Failed to refresh account:', error);
     }
-  }, [isConnected, setAccountInfo, setPositions]);
+  }, [isConnected, setAccountInfo, setPositions, setPendingOrders]);
 
   const placeOrder = useCallback(
     async (order: TradeOrder) => {
@@ -118,8 +126,10 @@ export function useMT5() {
   );
 
   const closePosition = useCallback(
-    async (positionId: string) => {
-      if (!isConnected) return;
+    async (positionId: string): Promise<{ success: boolean; error?: string }> => {
+      if (!isConnected) {
+        return { success: false, error: 'Not connected to MT5' };
+      }
 
       try {
         const response = await fetch('/api/mt5/trade', {
@@ -128,11 +138,18 @@ export function useMT5() {
           body: JSON.stringify({ action: 'close', positionId }),
         });
 
-        if (response.ok) {
+        const data = await response.json();
+
+        if (response.ok && data.success) {
           await refreshAccount();
+          return { success: true };
         }
+
+        return { success: false, error: data.error || 'Failed to close position' };
       } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Failed to close position';
         console.error('Failed to close position:', error);
+        return { success: false, error: errorMsg };
       }
     },
     [isConnected, refreshAccount]

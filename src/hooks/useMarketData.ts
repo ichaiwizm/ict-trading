@@ -69,12 +69,12 @@ export function useMarketData() {
     }
   }, [mounted, fetchCandles]);
 
-  // Update price periodically (every 30 seconds to avoid rate limits)
+  // Update price periodically (every 5 seconds - OANDA allows frequent calls)
   useEffect(() => {
     if (!mounted) return;
 
     refreshPrice();
-    const interval = setInterval(refreshPrice, 30000); // 30 seconds
+    const interval = setInterval(refreshPrice, 5000); // 5 seconds
     return () => clearInterval(interval);
   }, [mounted, refreshPrice]);
 

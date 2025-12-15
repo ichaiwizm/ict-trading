@@ -18,6 +18,7 @@ interface MT5State {
   setAccountId: (id: string | null) => void;
   setAccountInfo: (info: AccountInfo | null) => void;
   setPositions: (positions: Position[]) => void;
+  setPendingOrders: (orders: any[]) => void;
   setPlacingOrder: (status: boolean) => void;
   setLastOrderResult: (result: any) => void;
   disconnect: () => void;
@@ -67,6 +68,11 @@ export const useMT5Store = create<MT5State>((set) => ({
   setPositions: (positions) =>
     set({
       positions,
+    }),
+
+  setPendingOrders: (orders) =>
+    set({
+      pendingOrders: orders,
     }),
 
   setPlacingOrder: (status) =>

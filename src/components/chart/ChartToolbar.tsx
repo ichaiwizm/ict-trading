@@ -24,10 +24,7 @@ interface ChartToolbarProps {
 
 const SYMBOLS = [
   { value: 'EURUSD', label: 'EUR/USD' },
-  { value: 'GBPUSD', label: 'GBP/USD' },
-  { value: 'USDJPY', label: 'USD/JPY' },
   { value: 'XAUUSD', label: 'XAU/USD (Gold)' },
-  { value: 'BTCUSD', label: 'BTC/USD' },
 ];
 
 const TIMEFRAMES = [

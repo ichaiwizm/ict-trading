@@ -55,16 +55,21 @@ export function calculatePips(
 export function calculateLotSize(params: LotSizeParams): LotSizeResult {
   const { accountBalance, riskPercentage, stopLossPips, symbol } = params;
 
+  // Guard against invalid inputs
+  if (stopLossPips <= 0 || accountBalance <= 0 || riskPercentage <= 0) {
+    return {
+      lotSize: 0.01,
+      riskAmount: 0,
+      pipValue: getPipValue(symbol),
+      maxLoss: 0,
+    };
+  }
+
   const riskAmount = (accountBalance * riskPercentage) / 100;
-
   const pipValue = getPipValue(symbol);
-
   const lotSize = riskAmount / (stopLossPips * pipValue);
-
   const roundedLotSize = Math.round(lotSize * 100) / 100;
-
   const finalLotSize = Math.max(0.01, roundedLotSize);
-
   const maxLoss = finalLotSize * stopLossPips * pipValue;
 
   return {

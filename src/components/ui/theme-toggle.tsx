@@ -56,8 +56,8 @@ export function ThemeToggle() {
           'transition-all duration-300 ease-out',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
         )}
-        aria-label={isDark ? 'Passer au mode clair' : 'Passer au mode sombre'}
-        title="Clic: basculer | Clic droit: options"
+        aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+        title="Click: toggle | Right-click: options"
       >
         {/* Glow effect on hover */}
         <div
@@ -161,19 +161,19 @@ export function ThemeToggle() {
       {showMenu && (
         <div className="absolute right-0 top-full mt-2 z-50 min-w-[140px] rounded-lg border border-border bg-popover p-1 shadow-lg animate-in fade-in-0 zoom-in-95">
           <ThemeOption
-            label="Clair"
+            label="Light"
             icon="☀️"
             isActive={theme === 'light'}
             onClick={() => handleThemeSelect('light')}
           />
           <ThemeOption
-            label="Sombre"
+            label="Dark"
             icon="🌙"
             isActive={theme === 'dark'}
             onClick={() => handleThemeSelect('dark')}
           />
           <ThemeOption
-            label="Système"
+            label="System"
             icon="💻"
             isActive={theme === 'system'}
             onClick={() => handleThemeSelect('system')}

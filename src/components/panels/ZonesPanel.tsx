@@ -47,8 +47,7 @@ export function ZonesPanel() {
     return (
       <div
         key={zone.id}
-        className="p-3 rounded-lg bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/30 cursor-pointer hover:border-amber-400/50 transition-all duration-200 shadow-[0_0_10px_rgba(251,191,36,0.15)]"
-        onClick={() => {}}
+        className="p-3 rounded-lg bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/30 transition-all duration-200 shadow-[0_0_10px_rgba(251,191,36,0.15)]"
       >
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2">
@@ -86,10 +85,9 @@ export function ZonesPanel() {
     return (
       <div
         key={ob.id}
-        className={`p-2.5 rounded-lg border cursor-pointer hover:border-opacity-50 transition-all duration-200 ${
+        className={`p-2.5 rounded-lg border transition-all duration-200 ${
           isBullish ? "bg-emerald-500/5 border-emerald-500/20" : "bg-red-500/5 border-red-500/20"
         }`}
-        onClick={() => {}}
       >
         <div className="flex items-center justify-between mb-2">
           <Badge variant="outline" className={`text-xs ${isBullish ? "border-emerald-500/30 text-emerald-600 dark:text-emerald-400" : "border-red-500/30 text-red-600 dark:text-red-400"}`}>
@@ -112,10 +110,9 @@ export function ZonesPanel() {
     return (
       <div
         key={fvg.id}
-        className={`p-2.5 rounded-lg border cursor-pointer hover:border-opacity-50 transition-all duration-200 ${
+        className={`p-2.5 rounded-lg border transition-all duration-200 ${
           isBullish ? "bg-emerald-500/5 border-emerald-500/20" : "bg-red-500/5 border-red-500/20"
         }`}
-        onClick={() => {}}
       >
         <div className="flex items-center justify-between mb-2">
           <Badge variant="outline" className={`text-xs ${isBullish ? "border-emerald-500/30 text-emerald-600 dark:text-emerald-400" : "border-red-500/30 text-red-600 dark:text-red-400"}`}>

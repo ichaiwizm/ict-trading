@@ -11,35 +11,38 @@ import type { TradeOrder, PendingOrder, TradeResult } from './types';
 export async function placeMarketOrder(order: TradeOrder): Promise<TradeResult> {
   try {
     const connection = getConnection();
+    const orderType = order.type.toLowerCase();
 
-    const tradeRequest = {
-      actionType: 'ORDER_TYPE_BUY' === order.type.toUpperCase()
-        ? 'ORDER_TYPE_BUY'
-        : 'ORDER_TYPE_SELL',
-      symbol: order.symbol,
-      volume: order.volume,
-      stopLoss: order.stopLoss,
-      takeProfit: order.takeProfit,
+    const options = {
       comment: order.comment || 'ICT Trade',
       magic: order.magic,
     };
 
-    const result = await connection.createMarketBuyOrder(
-      order.symbol,
-      order.volume,
-      order.stopLoss,
-      order.takeProfit,
-      {
-        comment: order.comment || 'ICT Trade',
-        magic: order.magic,
-      }
-    );
+    let result;
+
+    if (orderType === 'buy') {
+      result = await connection.createMarketBuyOrder(
+        order.symbol,
+        order.volume,
+        order.stopLoss,
+        order.takeProfit,
+        options
+      );
+    } else {
+      result = await connection.createMarketSellOrder(
+        order.symbol,
+        order.volume,
+        order.stopLoss,
+        order.takeProfit,
+        options
+      );
+    }
 
     return {
       success: true,
       orderId: result.orderId,
       positionId: result.positionId,
-      message: 'Market order placed successfully',
+      message: `Market ${orderType.toUpperCase()} order placed successfully`,
     };
   } catch (error: any) {
     console.error('Failed to place market order:', error);
@@ -56,29 +59,65 @@ export async function placeMarketOrder(order: TradeOrder): Promise<TradeResult> 
 export async function placePendingOrder(order: PendingOrder): Promise<TradeResult> {
   try {
     const connection = getConnection();
+    const orderType = order.type.toLowerCase();
 
-    let orderType = 'ORDER_TYPE_BUY_LIMIT';
-    if (order.type === 'sell_limit') orderType = 'ORDER_TYPE_SELL_LIMIT';
-    else if (order.type === 'buy_stop') orderType = 'ORDER_TYPE_BUY_STOP';
-    else if (order.type === 'sell_stop') orderType = 'ORDER_TYPE_SELL_STOP';
+    const options = {
+      comment: order.comment || 'ICT Pending Order',
+      magic: order.magic,
+      expiration: order.expiration,
+    };
 
-    const result = await connection.createLimitBuyOrder(
-      order.symbol,
-      order.volume,
-      order.openPrice,
-      order.stopLoss,
-      order.takeProfit,
-      {
-        comment: order.comment || 'ICT Pending Order',
-        magic: order.magic,
-        expiration: order.expiration,
-      }
-    );
+    let result;
+
+    switch (orderType) {
+      case 'buy_limit':
+        result = await connection.createLimitBuyOrder(
+          order.symbol,
+          order.volume,
+          order.openPrice,
+          order.stopLoss,
+          order.takeProfit,
+          options
+        );
+        break;
+      case 'sell_limit':
+        result = await connection.createLimitSellOrder(
+          order.symbol,
+          order.volume,
+          order.openPrice,
+          order.stopLoss,
+          order.takeProfit,
+          options
+        );
+        break;
+      case 'buy_stop':
+        result = await connection.createStopBuyOrder(
+          order.symbol,
+          order.volume,
+          order.openPrice,
+          order.stopLoss,
+          order.takeProfit,
+          options
+        );
+        break;
+      case 'sell_stop':
+        result = await connection.createStopSellOrder(
+          order.symbol,
+          order.volume,
+          order.openPrice,
+          order.stopLoss,
+          order.takeProfit,
+          options
+        );
+        break;
+      default:
+        throw new Error(`Unknown order type: ${order.type}`);
+    }
 
     return {
       success: true,
       orderId: result.orderId,
-      message: 'Pending order placed successfully',
+      message: `Pending ${orderType.toUpperCase()} order placed successfully`,
     };
   } catch (error: any) {
     console.error('Failed to place pending order:', error);

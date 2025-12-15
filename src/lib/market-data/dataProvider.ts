@@ -1,8 +1,5 @@
-// Market data provider - Multiple sources with clear attribution
-// Sources:
-// - Alpha Vantage CURRENCY_EXCHANGE_RATE: Real-time quotes (FREE)
-// - Alpha Vantage FX_DAILY: Daily candles (FREE)
-// - Alpha Vantage FX_INTRADAY: Intraday candles (PREMIUM - not available)
+// Market data provider - OANDA as primary source
+// Provides real-time forex data via OANDA API v20
 
 export interface Candle {
   time: number;
@@ -11,7 +8,7 @@ export interface Candle {
   low: number;
   close: number;
   volume?: number;
-  source: string; // Attribution: where this data comes from
+  source: string;
 }
 
 export interface Quote {
@@ -20,33 +17,19 @@ export interface Quote {
   ask: number;
   spread: number;
   timestamp: number;
-  source: string; // Attribution: where this data comes from
+  source: string;
 }
 
-export type DataSource = 'alphavantage';
-
-interface DataProviderConfig {
-  source: DataSource;
-  apiKey?: string;
-}
+export type DataSource = 'oanda';
 
 class MarketDataProvider {
-  private config: DataProviderConfig;
   private cache: Map<string, { data: Candle[]; timestamp: number }> = new Map();
   private quoteCache: Map<string, { quote: Quote; timestamp: number }> = new Map();
-  private cacheTimeout = 60000; // 1 minute
+  private cacheTimeout = 60000; // 1 minute for candles
+  private quoteCacheTimeout = 5000; // 5 seconds for quotes
 
   constructor() {
-    const apiKey = process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_KEY;
-
-    console.log('[DataProvider] Initializing...');
-    console.log('[DataProvider] Alpha Vantage API Key present:', !!apiKey);
-
-    this.config = { source: 'alphavantage', apiKey };
-  }
-
-  setConfig(config: DataProviderConfig) {
-    this.config = config;
+    console.log('[DataProvider] Initialized with OANDA');
   }
 
   async getCandles(
@@ -62,138 +45,73 @@ class MarketDataProvider {
       return cached.data;
     }
 
-    console.log(`[DataProvider] Fetching candles for ${symbol} ${timeframe}...`);
+    console.log(`[DataProvider] Fetching candles from OANDA: ${symbol} ${timeframe}...`);
 
-    // Only daily timeframe is available for free on Alpha Vantage
-    if (timeframe !== '1D') {
-      console.log(`[DataProvider] Timeframe ${timeframe} not available (Alpha Vantage FREE only supports daily)`);
-      console.log('[DataProvider] Using daily candles instead');
+    try {
+      const response = await fetch(
+        `/api/oanda/candles?symbol=${symbol}&timeframe=${timeframe}&limit=${limit}`
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to fetch candles');
+      }
+
+      const data = await response.json();
+
+      if (!data.success || !data.candles) {
+        throw new Error('Invalid response from OANDA API');
+      }
+
+      const candles: Candle[] = data.candles;
+      console.log(`[DataProvider] Received ${candles.length} candles from OANDA`);
+
+      this.cache.set(cacheKey, { data: candles, timestamp: Date.now() });
+      return candles;
+    } catch (error) {
+      console.error('[DataProvider] Failed to fetch candles:', error);
+      throw error;
     }
-
-    const candles = await this.fetchAlphaVantageDaily(symbol, limit);
-
-    this.cache.set(cacheKey, { data: candles, timestamp: Date.now() });
-    return candles;
   }
 
   async getQuote(symbol: 'EURUSD' | 'XAUUSD'): Promise<Quote> {
     const cached = this.quoteCache.get(symbol);
 
-    // Quote cache is shorter - 30 seconds (to respect rate limits)
-    if (cached && Date.now() - cached.timestamp < 30000) {
+    if (cached && Date.now() - cached.timestamp < this.quoteCacheTimeout) {
       return cached.quote;
     }
 
-    if (!this.config.apiKey) {
-      throw new Error('Alpha Vantage API key not configured');
-    }
-
-    const fromSymbol = symbol.slice(0, 3);
-    const toSymbol = symbol.slice(3);
-
-    // For XAUUSD (Gold), use XAU
-    const from = symbol === 'XAUUSD' ? 'XAU' : fromSymbol;
-    const to = symbol === 'XAUUSD' ? 'USD' : toSymbol;
-
-    const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${from}&to_currency=${to}&apikey=${this.config.apiKey}`;
-
-    console.log(`[DataProvider] Fetching quote from Alpha Vantage: ${from}/${to}`);
+    console.log(`[DataProvider] Fetching quote from OANDA: ${symbol}...`);
 
     try {
-      const response = await fetch(url);
+      const response = await fetch(`/api/oanda/pricing?symbol=${symbol}`);
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to fetch quote');
+      }
+
       const data = await response.json();
 
-      const rateData = data['Realtime Currency Exchange Rate'];
-      if (rateData) {
-        const bid = parseFloat(rateData['8. Bid Price'] || rateData['5. Exchange Rate']);
-        const ask = parseFloat(rateData['9. Ask Price'] || rateData['5. Exchange Rate']);
-
-        const quote: Quote = {
-          symbol,
-          bid,
-          ask,
-          spread: ask - bid,
-          timestamp: Date.now(),
-          source: 'Alpha Vantage CURRENCY_EXCHANGE_RATE',
-        };
-
-        console.log(`[DataProvider] Quote from Alpha Vantage: bid=${bid}, ask=${ask}`);
-
-        this.quoteCache.set(symbol, { quote, timestamp: Date.now() });
-        return quote;
+      if (!data.success || !data.quote) {
+        throw new Error('Invalid response from OANDA API');
       }
 
-      if (data['Note']) {
-        throw new Error('Alpha Vantage rate limit exceeded. Please wait.');
-      }
+      const quote: Quote = data.quote;
+      console.log(`[DataProvider] Quote from OANDA: bid=${quote.bid}, ask=${quote.ask}`);
 
-      throw new Error('Invalid response from Alpha Vantage');
+      this.quoteCache.set(symbol, { quote, timestamp: Date.now() });
+      return quote;
     } catch (error) {
       console.error('[DataProvider] Failed to fetch quote:', error);
       throw error;
     }
   }
 
-  private async fetchAlphaVantageDaily(
-    symbol: string,
-    limit: number
-  ): Promise<Candle[]> {
-    if (!this.config.apiKey) {
-      throw new Error('Alpha Vantage API key not configured');
-    }
-
-    const fromSymbol = symbol.slice(0, 3);
-    const toSymbol = symbol.slice(3);
-
-    // For XAUUSD (Gold), use XAU
-    const from = symbol === 'XAUUSD' ? 'XAU' : fromSymbol;
-    const to = symbol === 'XAUUSD' ? 'USD' : toSymbol;
-
-    const url = `https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=${from}&to_symbol=${to}&apikey=${this.config.apiKey}&outputsize=full`;
-
-    console.log(`[DataProvider] Fetching daily candles from Alpha Vantage: ${from}/${to}`);
-
-    const response = await fetch(url);
-    const data = await response.json();
-
-    console.log('[DataProvider] Alpha Vantage response keys:', Object.keys(data));
-
-    if (data['Error Message']) {
-      console.error('[DataProvider] Alpha Vantage error:', data['Error Message']);
-      throw new Error(`Alpha Vantage error: ${data['Error Message']}`);
-    }
-
-    if (data['Note']) {
-      console.error('[DataProvider] Alpha Vantage rate limit:', data['Note']);
-      throw new Error('Alpha Vantage rate limit exceeded. Please wait and try again.');
-    }
-
-    if (data['Information']) {
-      console.error('[DataProvider] Alpha Vantage info:', data['Information']);
-      throw new Error(`Alpha Vantage: ${data['Information']}`);
-    }
-
-    const timeSeries = data['Time Series FX (Daily)'];
-
-    if (!timeSeries) {
-      console.error('[DataProvider] No time series found');
-      throw new Error('No data returned from Alpha Vantage');
-    }
-
-    const candles = Object.entries(timeSeries)
-      .slice(0, limit)
-      .map(([time, values]: [string, any]) => ({
-        time: new Date(time).getTime() / 1000,
-        open: parseFloat(values['1. open']),
-        high: parseFloat(values['2. high']),
-        low: parseFloat(values['3. low']),
-        close: parseFloat(values['4. close']),
-        source: 'Alpha Vantage FX_DAILY',
-      }))
-      .reverse();
-
-    console.log(`[DataProvider] Received ${candles.length} daily candles from Alpha Vantage`);
-    return candles;
+  clearCache(): void {
+    this.cache.clear();
+    this.quoteCache.clear();
+    console.log('[DataProvider] Cache cleared');
   }
 }
 
