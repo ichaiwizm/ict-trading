@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { Candle } from '@/lib/ict/types';
 import type { ConnectionStatus } from '@/lib/market-data/dataProvider';
 
@@ -28,117 +29,128 @@ interface MarketState {
   setConnectionStatus: (status: ConnectionStatus) => void;
 }
 
-export const useMarketStore = create<MarketState>((set, get) => ({
-  symbol: 'XAUUSD',
-  timeframe: '1h',
-  candles: {},
-  currentPrice: 0,
-  bid: 0,
-  ask: 0,
-  spread: 0,
-  isLoading: false,
-  error: null,
-  lastUpdate: Date.now(),
-
-  // Default connection status
-  connectionStatus: {
-    isConnected: false,
-    isLive: false,
-    latencyMs: 0,
-    lastSuccessfulFetch: 0,
-    consecutiveErrors: 0,
-    environment: 'practice',
-    apiCallCount: 0,
-    quoteFetchCount: 0,
-    candleFetchCount: 0,
-    lastQuoteCallTime: 0,
-    lastCandleCallTime: 0,
-  },
-
-  setSymbol: (symbol) =>
-    set({
-      symbol,
+export const useMarketStore = create<MarketState>()(
+  persist(
+    (set, get) => ({
+      symbol: 'XAUUSD',
+      timeframe: '1h',
       candles: {},
+      currentPrice: 0,
+      bid: 0,
+      ask: 0,
+      spread: 0,
+      isLoading: false,
       error: null,
       lastUpdate: Date.now(),
-    }),
 
-  setTimeframe: (tf) =>
-    set({
-      timeframe: tf,
-      lastUpdate: Date.now(),
-    }),
-
-  setCandles: (tf, candles) =>
-    set((state) => ({
-      candles: {
-        ...state.candles,
-        [tf]: candles,
+      // Default connection status
+      connectionStatus: {
+        isConnected: false,
+        isLive: false,
+        latencyMs: 0,
+        lastSuccessfulFetch: 0,
+        consecutiveErrors: 0,
+        environment: 'practice',
+        apiCallCount: 0,
+        quoteFetchCount: 0,
+        candleFetchCount: 0,
+        lastQuoteCallTime: 0,
+        lastCandleCallTime: 0,
       },
-      lastUpdate: Date.now(),
-    })),
 
-  updatePrice: (bid, ask) => {
-    const currentPrice = (bid + ask) / 2;
-    const spread = Number((ask - bid).toFixed(5));
+      setSymbol: (symbol) =>
+        set({
+          symbol,
+          candles: {},
+          error: null,
+          lastUpdate: Date.now(),
+        }),
 
-    set({
-      bid,
-      ask,
-      currentPrice,
-      spread,
-      lastUpdate: Date.now(),
-    });
-  },
+      setTimeframe: (tf) =>
+        set({
+          timeframe: tf,
+          lastUpdate: Date.now(),
+        }),
 
-  updateLastCandle: (tf, price) => {
-    const candles = get().candles[tf];
-    if (!candles || candles.length === 0) return;
-
-    const lastCandle = candles[candles.length - 1];
-    const updatedCandle: Candle = {
-      ...lastCandle,
-      close: price,
-      high: Math.max(lastCandle.high, price),
-      low: Math.min(lastCandle.low, price),
-    };
-
-    set((state) => ({
-      candles: {
-        ...state.candles,
-        [tf]: [...candles.slice(0, -1), updatedCandle],
-      },
-      lastUpdate: Date.now(),
-    }));
-  },
-
-  appendCandle: (tf, candle) =>
-    set((state) => {
-      const existing = state.candles[tf] || [];
-      const lastCandle = existing[existing.length - 1];
-
-      if (lastCandle && lastCandle.time === candle.time) {
-        return {
+      setCandles: (tf, candles) =>
+        set((state) => ({
           candles: {
             ...state.candles,
-            [tf]: [...existing.slice(0, -1), candle],
+            [tf]: candles,
           },
           lastUpdate: Date.now(),
+        })),
+
+      updatePrice: (bid, ask) => {
+        const currentPrice = (bid + ask) / 2;
+        const spread = Number((ask - bid).toFixed(5));
+
+        set({
+          bid,
+          ask,
+          currentPrice,
+          spread,
+          lastUpdate: Date.now(),
+        });
+      },
+
+      updateLastCandle: (tf, price) => {
+        const candles = get().candles[tf];
+        if (!candles || candles.length === 0) return;
+
+        const lastCandle = candles[candles.length - 1];
+        const updatedCandle: Candle = {
+          ...lastCandle,
+          close: price,
+          high: Math.max(lastCandle.high, price),
+          low: Math.min(lastCandle.low, price),
         };
-      }
 
-      return {
-        candles: {
-          ...state.candles,
-          [tf]: [...existing, candle],
-        },
-        lastUpdate: Date.now(),
-      };
+        set((state) => ({
+          candles: {
+            ...state.candles,
+            [tf]: [...candles.slice(0, -1), updatedCandle],
+          },
+          lastUpdate: Date.now(),
+        }));
+      },
+
+      appendCandle: (tf, candle) =>
+        set((state) => {
+          const existing = state.candles[tf] || [];
+          const lastCandle = existing[existing.length - 1];
+
+          if (lastCandle && lastCandle.time === candle.time) {
+            return {
+              candles: {
+                ...state.candles,
+                [tf]: [...existing.slice(0, -1), candle],
+              },
+              lastUpdate: Date.now(),
+            };
+          }
+
+          return {
+            candles: {
+              ...state.candles,
+              [tf]: [...existing, candle],
+            },
+            lastUpdate: Date.now(),
+          };
+        }),
+
+      setLoading: (loading) => set({ isLoading: loading }),
+
+      setError: (error) => set({ error }),
+
+      setConnectionStatus: (status) => set({ connectionStatus: status }),
     }),
-
-  setLoading: (loading) => set({ isLoading: loading }),
-
-  setError: (error) => set({ error }),
-
-  setConnectionStatus: (status) => set({ connectionStatus: status }),
-}));
+    {
+      name: 'ict-market-store',
+      partialize: (state) => ({
+        symbol: state.symbol,
+        timeframe: state.timeframe,
+      }),
+    }
+  )
+);

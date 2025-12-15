@@ -62,46 +62,50 @@ export function PanelLayout({
 }: PanelLayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-background p-2 md:p-3">
-      <div className="mx-auto max-w-[1800px]">
-        {/* Main 2-column grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-2 md:gap-3">
+      <div className="mx-auto max-w-[1920px]">
 
-          {/* Left Column - Chart & Bottom panels */}
-          <div className="space-y-2 md:space-y-3">
-            {/* Chart - takes most vertical space */}
-            <Panel noPadding className="h-[50vh] sm:h-[55vh] lg:h-[65vh]">
-              {chart}
-            </Panel>
+        {/* Chart - always full width at top */}
+        <Panel noPadding className="h-[45vh] sm:h-[50vh] lg:h-[60vh] xl:h-[65vh] mb-2 md:mb-3">
+          {chart}
+        </Panel>
 
-            {/* Bottom panels in 2 columns */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
-              <Panel title="Open Positions" subtitle="Active trades">
-                {positions}
-              </Panel>
-              <Panel title="Lot Calculator" subtitle="Risk management">
-                {calculator}
-              </Panel>
-            </div>
-          </div>
+        {/* Ultra-responsive grid - panels ordered by priority */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-3">
 
-          {/* Right Column - fixed width sidebar */}
-          <div className="space-y-2 md:space-y-3">
-            <Panel title="Market Trend" subtitle="Multi-timeframe bias">
-              {trend}
-            </Panel>
-            <Panel title="Kill Zones" subtitle="Optimal trading times">
-              {killZones}
-            </Panel>
-            <Panel title="Active Zones" subtitle="Key price levels">
-              {zones}
-            </Panel>
-            <Panel title="Quick Trade" subtitle="Execute orders">
-              {trade}
-            </Panel>
-            <Panel title="Account & Alerts" subtitle="Status & notifications">
-              <AccountAlertsPanel />
-            </Panel>
-          </div>
+          {/* Priority 1: Quick Trade - most used action */}
+          <Panel title="Quick Trade" subtitle="Execute orders" className="order-1">
+            {trade}
+          </Panel>
+
+          {/* Priority 2: Market Trend - key decision info */}
+          <Panel title="Market Trend" subtitle="Multi-timeframe bias" className="order-2">
+            {trend}
+          </Panel>
+
+          {/* Priority 3: Open Positions - active trades monitoring */}
+          <Panel title="Open Positions" subtitle="Active trades" className="order-3">
+            {positions}
+          </Panel>
+
+          {/* Priority 4: Kill Zones - timing info */}
+          <Panel title="Kill Zones" subtitle="Optimal trading times" className="order-4">
+            {killZones}
+          </Panel>
+
+          {/* Priority 5: Lot Calculator - risk management */}
+          <Panel title="Lot Calculator" subtitle="Risk management" className="order-5">
+            {calculator}
+          </Panel>
+
+          {/* Priority 6: Active Zones - technical levels */}
+          <Panel title="Active Zones" subtitle="Key price levels" className="order-6">
+            {zones}
+          </Panel>
+
+          {/* Priority 7: Account & Alerts - status info (least critical) */}
+          <Panel title="Account & Alerts" subtitle="Status & notifications" className="order-7 sm:col-span-2 lg:col-span-1">
+            <AccountAlertsPanel />
+          </Panel>
         </div>
       </div>
 

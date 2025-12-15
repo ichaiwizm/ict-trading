@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { useMarketStore } from '@/stores';
 import { marketDataProvider } from '@/lib/market-data';
 import type { Candle } from '@/lib/ict/types';
@@ -26,6 +26,12 @@ export function useMarketData() {
     setError,
     setConnectionStatus,
   } = useMarketStore();
+
+  // Ref to track current timeframe without recreating callbacks
+  const timeframeRef = useRef(timeframe);
+  useEffect(() => {
+    timeframeRef.current = timeframe;
+  }, [timeframe]);
 
   // Ensure we only run on client
   useEffect(() => {
@@ -84,12 +90,12 @@ export function useMarketData() {
       console.log(`[useMarketData] Quote: bid=${quote.bid}, ask=${quote.ask}`);
       updatePrice(quote.bid, quote.ask);
 
-      // Update the last candle with the new price (uses ask price as close)
-      updateLastCandle(timeframe, quote.ask);
+      // Update the last candle with the new price (uses ref to avoid recreating callback)
+      updateLastCandle(timeframeRef.current, quote.ask);
     } catch (err) {
       console.error('[useMarketData] Failed to refresh price:', err);
     }
-  }, [mounted, symbol, timeframe, updatePrice, updateLastCandle]);
+  }, [mounted, symbol, updatePrice, updateLastCandle]); // timeframe removed - using ref
 
   // Fetch candles on symbol/timeframe change (only after mount)
   useEffect(() => {
