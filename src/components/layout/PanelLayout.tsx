@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { AccountAlertsPanel } from '@/components/panels/AccountAlertsPanel';
 
 interface PanelProps {
   children: ReactNode;
@@ -9,9 +10,10 @@ interface PanelProps {
   title?: string;
   subtitle?: string;
   action?: ReactNode;
+  noPadding?: boolean;
 }
 
-function Panel({ children, className, title, subtitle, action }: PanelProps) {
+function Panel({ children, className, title, subtitle, action, noPadding }: PanelProps) {
   return (
     <div
       className={cn(
@@ -34,7 +36,7 @@ function Panel({ children, className, title, subtitle, action }: PanelProps) {
           {action && <div>{action}</div>}
         </div>
       )}
-      <div className={cn(title && 'p-4')}>{children}</div>
+      <div className={cn(title && !noPadding && 'p-4', noPadding && 'p-0')}>{children}</div>
     </div>
   );
 }
@@ -46,8 +48,6 @@ interface PanelLayoutProps {
   zones: ReactNode;
   calculator: ReactNode;
   trade: ReactNode;
-  account: ReactNode;
-  alerts: ReactNode;
   positions: ReactNode;
 }
 
@@ -58,8 +58,6 @@ export function PanelLayout({
   zones,
   calculator,
   trade,
-  account,
-  alerts,
   positions,
 }: PanelLayoutProps) {
   return (
@@ -74,7 +72,9 @@ export function PanelLayout({
               {chart}
             </Panel>
             {/* Positions Panel - Below chart */}
-            {positions}
+            <Panel title="Open Positions" subtitle="Active trades">
+              {positions}
+            </Panel>
           </div>
 
           {/* Right Column - Analysis Panels */}
@@ -97,7 +97,7 @@ export function PanelLayout({
         </div>
 
         {/* Bottom Row - Trading Tools */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {/* Lot Calculator */}
           <Panel title="Lot Calculator" subtitle="Risk management">
             {calculator}
@@ -108,14 +108,9 @@ export function PanelLayout({
             {trade}
           </Panel>
 
-          {/* Account Panel */}
-          <Panel title="Account" subtitle="Balance & equity">
-            {account}
-          </Panel>
-
-          {/* Alerts Panel */}
-          <Panel title="Alerts" subtitle="Active notifications">
-            {alerts}
+          {/* Account & Alerts Panel (Combined with Tabs) */}
+          <Panel title="Account & Alerts" subtitle="Status & notifications">
+            <AccountAlertsPanel />
           </Panel>
         </div>
       </div>

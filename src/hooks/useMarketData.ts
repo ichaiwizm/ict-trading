@@ -21,6 +21,7 @@ export function useMarketData() {
     connectionStatus,
     setCandles,
     updatePrice,
+    updateLastCandle,
     setLoading,
     setError,
     setConnectionStatus,
@@ -82,10 +83,13 @@ export function useMarketData() {
       const quote = await marketDataProvider.getQuote(symbol);
       console.log(`[useMarketData] Quote: bid=${quote.bid}, ask=${quote.ask}`);
       updatePrice(quote.bid, quote.ask);
+
+      // Update the last candle with the new price (uses ask price as close)
+      updateLastCandle(timeframe, quote.ask);
     } catch (err) {
       console.error('[useMarketData] Failed to refresh price:', err);
     }
-  }, [mounted, symbol, updatePrice]);
+  }, [mounted, symbol, timeframe, updatePrice, updateLastCandle]);
 
   // Fetch candles on symbol/timeframe change (only after mount)
   useEffect(() => {

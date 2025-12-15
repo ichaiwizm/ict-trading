@@ -21,6 +21,7 @@ interface MarketState {
   setTimeframe: (tf: string) => void;
   setCandles: (tf: string, candles: Candle[]) => void;
   updatePrice: (bid: number, ask: number) => void;
+  updateLastCandle: (tf: string, price: number) => void;
   appendCandle: (tf: string, candle: Candle) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -88,6 +89,27 @@ export const useMarketStore = create<MarketState>((set, get) => ({
       spread,
       lastUpdate: Date.now(),
     });
+  },
+
+  updateLastCandle: (tf, price) => {
+    const candles = get().candles[tf];
+    if (!candles || candles.length === 0) return;
+
+    const lastCandle = candles[candles.length - 1];
+    const updatedCandle: Candle = {
+      ...lastCandle,
+      close: price,
+      high: Math.max(lastCandle.high, price),
+      low: Math.min(lastCandle.low, price),
+    };
+
+    set((state) => ({
+      candles: {
+        ...state.candles,
+        [tf]: [...candles.slice(0, -1), updatedCandle],
+      },
+      lastUpdate: Date.now(),
+    }));
   },
 
   appendCandle: (tf, candle) =>

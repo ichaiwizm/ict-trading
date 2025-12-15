@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { OrderBlock, FairValueGap, ConfluenceZone } from "@/lib/ict/types";
 import { ChevronDown, ChevronRight, Star, Loader2 } from "lucide-react";
@@ -174,56 +173,42 @@ export function ZonesPanel() {
   // Show loading state when waiting for data
   if (!hasRequiredData) {
     return (
-      <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold tracking-wider text-purple-600 dark:text-purple-400">
-            ACTIVE ZONES
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center py-8 gap-3">
-          <Loader2 className="h-6 w-6 animate-spin text-purple-500/60" />
-          <span className="text-sm text-muted-foreground font-mono">
-            Detecting key levels...
-          </span>
-          <div className="flex gap-2 text-xs text-muted-foreground/60">
-            <span className={has1hData ? "text-emerald-500" : ""}>1H {has1hData ? "OK" : "..."}</span>
-            <span className={has4hData ? "text-emerald-500" : ""}>4H {has4hData ? "OK" : "..."}</span>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col items-center justify-center py-8 gap-3">
+        <Loader2 className="h-6 w-6 animate-spin text-purple-500/60" />
+        <span className="text-sm text-muted-foreground font-mono">
+          Detecting key levels...
+        </span>
+        <div className="flex gap-2 text-xs text-muted-foreground/60">
+          <span className={has1hData ? "text-emerald-500" : ""}>1H {has1hData ? "OK" : "..."}</span>
+          <span className={has4hData ? "text-emerald-500" : ""}>4H {has4hData ? "OK" : "..."}</span>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-semibold tracking-wider text-purple-600 dark:text-purple-400">
-          ACTIVE ZONES
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3 max-h-[600px] overflow-y-auto">
-        {renderSection(
-          "CONFLUENCE ZONES",
-          "confluence",
-          sortedConfluence.length,
-          sortedConfluence.map(renderConfluenceZone),
-          true
-        )}
+    <div className="space-y-3 max-h-[600px] overflow-y-auto">
+      {renderSection(
+        "CONFLUENCE ZONES",
+        "confluence",
+        sortedConfluence.length,
+        sortedConfluence.map(renderConfluenceZone),
+        true
+      )}
 
-        {renderSection(
-          "ORDER BLOCKS",
-          "orderBlocks",
-          sortedOBs.length,
-          sortedOBs.map(renderOrderBlock)
-        )}
+      {renderSection(
+        "ORDER BLOCKS",
+        "orderBlocks",
+        sortedOBs.length,
+        sortedOBs.map(renderOrderBlock)
+      )}
 
-        {renderSection(
-          "FAIR VALUE GAPS",
-          "fvgs",
-          sortedFVGs.length,
-          sortedFVGs.map(renderFVG)
-        )}
-      </CardContent>
-    </Card>
+      {renderSection(
+        "FAIR VALUE GAPS",
+        "fvgs",
+        sortedFVGs.length,
+        sortedFVGs.map(renderFVG)
+      )}
+    </div>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -61,72 +60,30 @@ export function PositionsPanel() {
 
   if (positions.length === 0) {
     return (
-      <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-semibold tracking-wider text-amber-600 dark:text-amber-400">
-              OPEN POSITIONS
-            </CardTitle>
-            <Badge variant="outline" className="text-xs border-border text-muted-foreground">
-              0
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center py-6 space-y-3">
-          <div className="p-3 rounded-full bg-secondary border border-border">
-            <Layers className="h-6 w-6 text-muted-foreground" />
-          </div>
-          <p className="text-sm text-muted-foreground">No open positions</p>
-          <p className="text-xs text-muted-foreground/70">Place a trade to get started</p>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col items-center justify-center py-6 space-y-3">
+        <div className="p-3 rounded-full bg-secondary border border-border">
+          <Layers className="h-6 w-6 text-muted-foreground" />
+        </div>
+        <p className="text-sm text-muted-foreground">No open positions</p>
+        <p className="text-xs text-muted-foreground/70">Place a trade to get started</p>
+      </div>
     );
   }
 
   return (
     <>
-      <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-amber-500/30 transition-all duration-300">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-semibold tracking-wider text-amber-600 dark:text-amber-400">
-              OPEN POSITIONS
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs border-amber-500/30 text-amber-600 dark:text-amber-400">
-                {positions.length}
-              </Badge>
-              <span className={cn(
-                "text-sm font-mono font-bold",
-                isProfitable ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
-              )}>
-                {isProfitable ? "+" : ""}${totalProfit.toFixed(2)}
-              </span>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="p-1 rounded hover:bg-amber-500/20 text-muted-foreground hover:text-amber-500 transition-colors"
-                title="Expand"
-              >
-                <Maximize2 className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="p-0">
-          <div className="max-h-[280px] overflow-y-auto">
-            <div className="p-3 space-y-2">
-              {positions.map((position) => (
-                <PositionItem
-                  key={position.id}
-                  position={position}
-                  onClose={handleClosePosition}
-                  formatPrice={formatPrice}
-                />
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="max-h-[280px] overflow-y-auto">
+        <div className="space-y-2">
+          {positions.map((position) => (
+            <PositionItem
+              key={position.id}
+              position={position}
+              onClose={handleClosePosition}
+              formatPrice={formatPrice}
+            />
+          ))}
+        </div>
+      </div>
 
       {/* Modal agrandi */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

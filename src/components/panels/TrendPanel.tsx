@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendAnalysis, StructureBreak } from "@/lib/ict/types";
 import { TrendingUp, TrendingDown, Loader2 } from "lucide-react";
@@ -13,22 +12,15 @@ export function TrendPanel() {
   // Show loading state when no trend data
   if (!trend) {
     return (
-      <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold tracking-wider text-purple-600 dark:text-purple-400">
-            TREND ANALYSIS
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center py-8 gap-3">
-          <Loader2 className="h-6 w-6 animate-spin text-purple-500/60" />
-          <span className="text-sm text-muted-foreground font-mono">
-            {isAnalyzing ? "Analyzing market..." : "Waiting for data..."}
-          </span>
-          <span className="text-xs text-muted-foreground/60">
-            Waiting for 1H & 4H data
-          </span>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col items-center justify-center py-8 gap-3">
+        <Loader2 className="h-6 w-6 animate-spin text-purple-500/60" />
+        <span className="text-sm text-muted-foreground font-mono">
+          {isAnalyzing ? "Analyzing market..." : "Waiting for data..."}
+        </span>
+        <span className="text-xs text-muted-foreground/60">
+          Waiting for 1H & 4H data
+        </span>
+      </div>
     );
   }
 
@@ -92,44 +84,37 @@ export function TrendPanel() {
   };
 
   return (
-    <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-semibold tracking-wider text-purple-600 dark:text-purple-400">
-          TREND ANALYSIS
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {renderDirection(currentTrend.higherTimeframe, "4H")}
-        {renderDirection(currentTrend.lowerTimeframe, "1H")}
+    <div className="space-y-4">
+      {renderDirection(currentTrend.higherTimeframe, "4H")}
+      {renderDirection(currentTrend.lowerTimeframe, "1H")}
 
-        <div className="pt-2">
-          <Badge className={`w-full justify-center py-2 text-sm font-bold tracking-wider ${getBiasColor()}`}>
-            {getBiasText()}
-          </Badge>
+      <div className="pt-2">
+        <Badge className={`w-full justify-center py-2 text-sm font-bold tracking-wider ${getBiasColor()}`}>
+          {getBiasText()}
+        </Badge>
+      </div>
+
+      <div className="space-y-1">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-muted-foreground uppercase tracking-wide">Strength</span>
+          <span className="text-xs font-mono text-purple-600 dark:text-purple-400">{currentTrend.strength}%</span>
         </div>
+        <div className="h-2 bg-secondary rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(139,92,246,0.5)]"
+            style={{ width: `${currentTrend.strength}%` }}
+          />
+        </div>
+      </div>
 
-        <div className="space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Strength</span>
-            <span className="text-xs font-mono text-purple-600 dark:text-purple-400">{currentTrend.strength}%</span>
-          </div>
-          <div className="h-2 bg-secondary rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(139,92,246,0.5)]"
-              style={{ width: `${currentTrend.strength}%` }}
-            />
+      {currentTrend.structureBreaks.length > 0 && (
+        <div className="pt-2 space-y-1">
+          <span className="text-xs text-muted-foreground uppercase tracking-wide">Recent Breaks</span>
+          <div className="space-y-1 max-h-32 overflow-y-auto">
+            {currentTrend.structureBreaks.slice(0, 5).map(formatStructureBreak)}
           </div>
         </div>
-
-        {currentTrend.structureBreaks.length > 0 && (
-          <div className="pt-2 space-y-1">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Recent Breaks</span>
-            <div className="space-y-1 max-h-32 overflow-y-auto">
-              {currentTrend.structureBreaks.slice(0, 5).map(formatStructureBreak)}
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }

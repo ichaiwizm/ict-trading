@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { KillZone, KillZoneName } from "@/lib/ict/types";
 import { Clock } from "lucide-react";
@@ -134,15 +133,8 @@ export function KillZonePanel() {
   };
 
   return (
-    <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-semibold tracking-wider text-purple-600 dark:text-purple-400">
-          KILL ZONES
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {killZones.map(renderZone)}
-      </CardContent>
-    </Card>
+    <div className="space-y-3">
+      {killZones.map(renderZone)}
+    </div>
   );
 }
