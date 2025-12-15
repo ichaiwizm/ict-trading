@@ -17,7 +17,7 @@ import { useICTAnalysis } from '@/hooks/useICTAnalysis';
 import { useMarketData } from '@/hooks/useMarketData';
 
 export default function DashboardPage() {
-  // Fetch real market data from Alpha Vantage
+  // Fetch real market data from OANDA fxTrade API
   useMarketData();
 
   // Initialize ICT Analysis

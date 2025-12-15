@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { OrderBlock, FairValueGap, ConfluenceZone } from "@/lib/ict/types";
-import { ChevronDown, ChevronRight, Star } from "lucide-react";
+import { ChevronDown, ChevronRight, Star, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useICTStore, useMarketStore } from "@/stores";
 
@@ -12,11 +12,17 @@ export function ZonesPanel() {
   const fairValueGaps = useICTStore((state) => state.fairValueGaps);
   const confluenceZones = useICTStore((state) => state.confluenceZones);
   const currentPrice = useMarketStore((state) => state.currentPrice);
+  const candles = useMarketStore((state) => state.candles);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     confluence: true,
     orderBlocks: true,
     fvgs: true,
   });
+
+  // Check if we have 1h and 4h data needed for analysis
+  const has1hData = candles['1h'] && candles['1h'].length > 0;
+  const has4hData = candles['4h'] && candles['4h'].length > 0;
+  const hasRequiredData = has1hData && has4hData;
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
@@ -162,6 +168,29 @@ export function ZonesPanel() {
       {expandedSections[key] && <div className="space-y-2 pl-1">{children}</div>}
     </div>
   );
+
+  // Show loading state when waiting for data
+  if (!hasRequiredData) {
+    return (
+      <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold tracking-wider text-purple-600 dark:text-purple-400">
+            ACTIVE ZONES
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center justify-center py-8 gap-3">
+          <Loader2 className="h-6 w-6 animate-spin text-purple-500/60" />
+          <span className="text-sm text-muted-foreground font-mono">
+            Detecting key levels...
+          </span>
+          <div className="flex gap-2 text-xs text-muted-foreground/60">
+            <span className={has1hData ? "text-emerald-500" : ""}>1H {has1hData ? "OK" : "..."}</span>
+            <span className={has4hData ? "text-emerald-500" : ""}>4H {has4hData ? "OK" : "..."}</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">

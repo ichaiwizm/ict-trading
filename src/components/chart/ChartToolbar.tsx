@@ -23,20 +23,39 @@ interface ChartToolbarProps {
 }
 
 const SYMBOLS = [
+  { value: 'XAUUSD', label: 'XAU/USD (Gold)' },
   { value: 'EURUSD', label: 'EUR/USD' },
   { value: 'GBPUSD', label: 'GBP/USD' },
   { value: 'USDJPY', label: 'USD/JPY' },
-  { value: 'XAUUSD', label: 'XAU/USD (Gold)' },
-  { value: 'BTCUSD', label: 'BTC/USD' },
 ];
 
-const TIMEFRAMES = [
-  { value: '1m', label: '1M' },
-  { value: '5m', label: '5M' },
-  { value: '15m', label: '15M' },
-  { value: '1h', label: '1H' },
-  { value: '4h', label: '4H' },
-  { value: '1D', label: '1D' },
+// Grouped timeframes for better UX
+const TIMEFRAME_GROUPS = [
+  {
+    label: 'SEC',
+    timeframes: [
+      { value: '5S', label: '5s' },
+      { value: '15S', label: '15s' },
+      { value: '30S', label: '30s' },
+    ],
+  },
+  {
+    label: 'MIN',
+    timeframes: [
+      { value: '1m', label: '1m' },
+      { value: '5m', label: '5m' },
+      { value: '15m', label: '15m' },
+      { value: '30m', label: '30m' },
+    ],
+  },
+  {
+    label: 'H/D',
+    timeframes: [
+      { value: '1h', label: '1H' },
+      { value: '4h', label: '4H' },
+      { value: '1D', label: '1D' },
+    ],
+  },
 ];
 
 export default function ChartToolbar({
@@ -68,22 +87,31 @@ export default function ChartToolbar({
           </SelectContent>
         </Select>
 
-        <div className="flex items-center gap-1 bg-secondary border border-border rounded-md p-1">
-          {TIMEFRAMES.map((tf) => (
-            <Button
-              key={tf.value}
-              onClick={() => onTimeframeChange(tf.value)}
-              variant={timeframe === tf.value ? 'default' : 'ghost'}
-              size="sm"
-              className={cn(
-                'h-8 px-3 text-xs font-mono transition-all',
-                timeframe === tf.value
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+        <div className="flex items-center gap-0.5 bg-secondary/80 border border-border rounded-lg p-1 backdrop-blur-sm">
+          {TIMEFRAME_GROUPS.map((group, groupIndex) => (
+            <div key={group.label} className="flex items-center">
+              {groupIndex > 0 && (
+                <div className="w-px h-6 bg-border/60 mx-1" />
               )}
-            >
-              {tf.label}
-            </Button>
+              <div className="flex items-center gap-0.5">
+                {group.timeframes.map((tf) => (
+                  <Button
+                    key={tf.value}
+                    onClick={() => onTimeframeChange(tf.value)}
+                    variant={timeframe === tf.value ? 'default' : 'ghost'}
+                    size="sm"
+                    className={cn(
+                      'h-7 px-2 text-xs font-mono transition-all duration-200',
+                      timeframe === tf.value
+                        ? 'bg-gradient-to-b from-cyan-500 to-cyan-600 text-white shadow-lg shadow-cyan-500/30 border-0'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent/80'
+                    )}
+                  >
+                    {tf.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>

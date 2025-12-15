@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import type { Candle } from '@/lib/ict/types';
+import type { ConnectionStatus } from '@/lib/market-data/dataProvider';
 
 interface MarketState {
-  symbol: 'EURUSD' | 'XAUUSD';
+  symbol: 'XAUUSD' | 'EURUSD';
   timeframe: string;
   candles: Record<string, Candle[]>;
   currentPrice: number;
@@ -13,18 +14,22 @@ interface MarketState {
   error: string | null;
   lastUpdate: number;
 
-  setSymbol: (symbol: 'EURUSD' | 'XAUUSD') => void;
+  // Connection status for live indicator
+  connectionStatus: ConnectionStatus;
+
+  setSymbol: (symbol: 'XAUUSD' | 'EURUSD') => void;
   setTimeframe: (tf: string) => void;
   setCandles: (tf: string, candles: Candle[]) => void;
   updatePrice: (bid: number, ask: number) => void;
   appendCandle: (tf: string, candle: Candle) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  setConnectionStatus: (status: ConnectionStatus) => void;
 }
 
 export const useMarketStore = create<MarketState>((set, get) => ({
-  symbol: 'EURUSD',
-  timeframe: '1D',
+  symbol: 'XAUUSD',
+  timeframe: '1h',
   candles: {},
   currentPrice: 0,
   bid: 0,
@@ -33,6 +38,21 @@ export const useMarketStore = create<MarketState>((set, get) => ({
   isLoading: false,
   error: null,
   lastUpdate: Date.now(),
+
+  // Default connection status
+  connectionStatus: {
+    isConnected: false,
+    isLive: false,
+    latencyMs: 0,
+    lastSuccessfulFetch: 0,
+    consecutiveErrors: 0,
+    environment: 'practice',
+    apiCallCount: 0,
+    quoteFetchCount: 0,
+    candleFetchCount: 0,
+    lastQuoteCallTime: 0,
+    lastCandleCallTime: 0,
+  },
 
   setSymbol: (symbol) =>
     set({
@@ -97,4 +117,6 @@ export const useMarketStore = create<MarketState>((set, get) => ({
   setLoading: (loading) => set({ isLoading: loading }),
 
   setError: (error) => set({ error }),
+
+  setConnectionStatus: (status) => set({ connectionStatus: status }),
 }));

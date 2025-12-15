@@ -18,16 +18,26 @@ export function useMarketData() {
     spread,
     isLoading,
     error,
+    connectionStatus,
     setCandles,
     updatePrice,
     setLoading,
     setError,
+    setConnectionStatus,
   } = useMarketStore();
 
   // Ensure we only run on client
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Subscribe to connection status changes
+  useEffect(() => {
+    const unsubscribe = marketDataProvider.onStatusChange((status) => {
+      setConnectionStatus(status);
+    });
+    return unsubscribe;
+  }, [setConnectionStatus]);
 
   const fetchCandles = useCallback(async () => {
     if (!mounted) return;
@@ -37,9 +47,24 @@ export function useMarketData() {
     setError(null);
 
     try {
+      // Fetch candles for the selected timeframe
       const data = await marketDataProvider.getCandles(symbol, timeframe, 200);
-      console.log(`[useMarketData] Received ${data.length} candles`);
+      console.log(`[useMarketData] Received ${data.length} candles for ${timeframe}`);
       setCandles(timeframe, data as Candle[]);
+
+      // Also fetch 1h and 4h candles for ICT analysis (if not already the selected timeframe)
+      const analysisTimeframes = ['1h', '4h'];
+      for (const tf of analysisTimeframes) {
+        if (tf !== timeframe) {
+          try {
+            const analysisData = await marketDataProvider.getCandles(symbol, tf, 200);
+            console.log(`[useMarketData] Received ${analysisData.length} candles for ${tf} (ICT analysis)`);
+            setCandles(tf, analysisData as Candle[]);
+          } catch (err) {
+            console.warn(`[useMarketData] Failed to fetch ${tf} candles for ICT analysis:`, err);
+          }
+        }
+      }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to fetch candles';
       console.error('[useMarketData] Error fetching candles:', errorMsg);
@@ -69,12 +94,12 @@ export function useMarketData() {
     }
   }, [mounted, fetchCandles]);
 
-  // Update price periodically (every 30 seconds to avoid rate limits)
+  // Update price more frequently now that OANDA has better rate limits (every 5 seconds)
   useEffect(() => {
     if (!mounted) return;
 
     refreshPrice();
-    const interval = setInterval(refreshPrice, 30000); // 30 seconds
+    const interval = setInterval(refreshPrice, 5000); // 5 seconds with OANDA
     return () => clearInterval(interval);
   }, [mounted, refreshPrice]);
 
@@ -90,6 +115,7 @@ export function useMarketData() {
     spread,
     isLoading,
     error,
+    connectionStatus,
     refetch: fetchCandles,
     refreshPrice,
   };

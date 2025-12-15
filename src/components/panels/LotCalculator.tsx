@@ -15,13 +15,14 @@ export function LotCalculator() {
   const [accountBalance, setAccountBalance] = useState<number>(10000);
   const [riskPercentage, setRiskPercentage] = useState<number>(1);
   const [stopLossPips, setStopLossPips] = useState<number>(20);
+  const [useManualBalance, setUseManualBalance] = useState<boolean>(true);
 
-  // Update balance when account info is available
+  // Update balance when account info is available (only if not using manual)
   useEffect(() => {
-    if (accountInfo?.balance) {
+    if (accountInfo?.balance && !useManualBalance) {
       setAccountBalance(accountInfo.balance);
     }
-  }, [accountInfo]);
+  }, [accountInfo, useManualBalance]);
 
   // Calculate lot size
   const calculation = calculateLotSize({
@@ -42,7 +43,22 @@ export function LotCalculator() {
       <CardContent className="space-y-4">
         {/* Account Balance */}
         <div className="space-y-2">
-          <label className="text-xs text-muted-foreground">Account Balance</label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-muted-foreground">Account Balance</label>
+            {accountInfo?.balance && (
+              <button
+                onClick={() => {
+                  setUseManualBalance(!useManualBalance);
+                  if (useManualBalance && accountInfo.balance) {
+                    setAccountBalance(accountInfo.balance);
+                  }
+                }}
+                className="text-[10px] font-mono text-purple-500 hover:text-purple-400 transition-colors"
+              >
+                {useManualBalance ? 'Use MT5' : 'Manual'}
+              </button>
+            )}
+          </div>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               $
@@ -52,7 +68,6 @@ export function LotCalculator() {
               value={accountBalance}
               onChange={(e) => setAccountBalance(Number(e.target.value))}
               className="pl-7 font-mono"
-              disabled={!!accountInfo?.balance}
             />
           </div>
         </div>

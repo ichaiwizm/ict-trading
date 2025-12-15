@@ -3,20 +3,35 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendAnalysis, StructureBreak } from "@/lib/ict/types";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Loader2 } from "lucide-react";
 import { useICTStore } from "@/stores";
 
 export function TrendPanel() {
   const trend = useICTStore((state) => state.trend);
 
-  // Default trend for demo
-  const currentTrend: TrendAnalysis = trend || {
-    direction: 'bullish',
-    strength: 75,
-    higherTimeframe: 'bullish',
-    lowerTimeframe: 'bullish',
-    structureBreaks: [],
-  };
+  // Show loading state when no trend data
+  if (!trend) {
+    return (
+      <Card className="bg-card/95 border-border shadow-xl backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold tracking-wider text-purple-600 dark:text-purple-400">
+            TREND ANALYSIS
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center justify-center py-8 gap-3">
+          <Loader2 className="h-6 w-6 animate-spin text-purple-500/60" />
+          <span className="text-sm text-muted-foreground font-mono">
+            Analyzing market structure...
+          </span>
+          <span className="text-xs text-muted-foreground/60">
+            Waiting for 1H & 4H data
+          </span>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const currentTrend = trend;
   const getBiasText = () => {
     if (currentTrend.higherTimeframe === "bullish" && currentTrend.lowerTimeframe === "bullish") {
       return "LONGS ONLY";
