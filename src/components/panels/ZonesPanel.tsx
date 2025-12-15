@@ -13,6 +13,11 @@ export function ZonesPanel() {
   const confluenceZones = useICTStore((state) => state.confluenceZones);
   const currentPrice = useMarketStore((state) => state.currentPrice);
   const candles = useMarketStore((state) => state.candles);
+  const symbol = useMarketStore((state) => state.symbol);
+
+  const formatPrice = (price: number) => {
+    return price.toFixed(symbol === "XAUUSD" ? 2 : 5);
+  };
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     confluence: true,
     orderBlocks: true,
@@ -71,11 +76,11 @@ export function ZonesPanel() {
         <div className="space-y-1">
           <div className="flex justify-between text-xs font-mono">
             <span className="text-muted-foreground">Top:</span>
-            <span className="text-foreground">${zone.overlapTop.toFixed(2)}</span>
+            <span className="text-foreground">{formatPrice(zone.overlapTop)}</span>
           </div>
           <div className="flex justify-between text-xs font-mono">
             <span className="text-muted-foreground">Bot:</span>
-            <span className="text-foreground">${zone.overlapBottom.toFixed(2)}</span>
+            <span className="text-foreground">{formatPrice(zone.overlapBottom)}</span>
           </div>
           <div className="flex justify-between text-xs font-mono">
             <span className="text-muted-foreground">Strength:</span>
@@ -103,8 +108,8 @@ export function ZonesPanel() {
         </div>
         <div className="space-y-1">
           <div className="flex justify-between text-xs font-mono">
-            <span className="text-muted-foreground">${ob.top.toFixed(2)}</span>
-            <span className="text-muted-foreground">${ob.bottom.toFixed(2)}</span>
+            <span className="text-muted-foreground">{formatPrice(ob.top)}</span>
+            <span className="text-muted-foreground">{formatPrice(ob.bottom)}</span>
           </div>
         </div>
       </div>
@@ -128,8 +133,8 @@ export function ZonesPanel() {
         </div>
         <div className="space-y-1">
           <div className="flex justify-between text-xs font-mono">
-            <span className="text-muted-foreground">${fvg.top.toFixed(2)}</span>
-            <span className="text-muted-foreground">${fvg.bottom.toFixed(2)}</span>
+            <span className="text-muted-foreground">{formatPrice(fvg.top)}</span>
+            <span className="text-muted-foreground">{formatPrice(fvg.bottom)}</span>
           </div>
         </div>
       </div>
