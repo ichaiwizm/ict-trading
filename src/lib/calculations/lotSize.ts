@@ -52,6 +52,24 @@ export function calculatePips(
   return Number((priceDiff * 10000).toFixed(1));
 }
 
+/**
+ * Converts pips to price distance based on symbol
+ * Inverse of calculatePips - useful for adding buffer to SL levels
+ */
+export function pipsToPrice(pips: number, symbol: string): number {
+  const normalizedSymbol = symbol.toUpperCase().replace(/[^A-Z]/g, '');
+
+  if (normalizedSymbol === 'XAUUSD') {
+    return pips * 0.1; // 1 pip = 0.1 for gold
+  }
+
+  if (normalizedSymbol.includes('JPY')) {
+    return pips * 0.01; // 1 pip = 0.01 for JPY pairs
+  }
+
+  return pips * 0.0001; // 1 pip = 0.0001 for most forex pairs
+}
+
 export function calculateLotSize(params: LotSizeParams): LotSizeResult {
   const { accountBalance, riskPercentage, stopLossPips, symbol } = params;
 

@@ -22,10 +22,15 @@ interface ICTState {
   isAnalyzing: boolean;
   lastAnalysis: number;
 
+  // Active signal for TradePanel auto-fill
+  activeSignal: EntrySignal | null;
+
   settings: {
     swingLength: number;
     showMitigated: boolean;
     showInvalidated: boolean;
+    slBufferPips: number;
+    defaultRiskPercentage: number;
   };
 
   setAnalysis: (analysis: Partial<ICTState>) => void;
@@ -33,6 +38,7 @@ interface ICTState {
   updateFVG: (id: string, updates: Partial<FairValueGap>) => void;
   setKillZones: (kzs: KillZone[]) => void;
   updateSettings: (settings: Partial<ICTState['settings']>) => void;
+  setActiveSignal: (signal: EntrySignal | null) => void;
   clearAnalysis: () => void;
 }
 
@@ -47,11 +53,14 @@ export const useICTStore = create<ICTState>((set, get) => ({
   entrySignals: [],
   isAnalyzing: false,
   lastAnalysis: 0,
+  activeSignal: null,
 
   settings: {
     swingLength: 10,
     showMitigated: false,
     showInvalidated: false,
+    slBufferPips: 5,
+    defaultRiskPercentage: 1,
   },
 
   setAnalysis: (analysis) =>
@@ -88,6 +97,9 @@ export const useICTStore = create<ICTState>((set, get) => ({
       },
     })),
 
+  setActiveSignal: (signal) =>
+    set({ activeSignal: signal }),
+
   clearAnalysis: () =>
     set({
       trend: null,
@@ -97,6 +109,7 @@ export const useICTStore = create<ICTState>((set, get) => ({
       fibonacci: null,
       confluenceZones: [],
       entrySignals: [],
+      activeSignal: null,
       lastAnalysis: 0,
     }),
 }));

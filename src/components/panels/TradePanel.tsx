@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useMT5Store } from "@/stores/mt5Store";
 import { useMarketStore } from "@/stores/marketStore";
 import { useAlertStore } from "@/stores/alertStore";
+import { useICTStore } from "@/stores/ictStore";
+import { calculateLotSize } from "@/lib/calculations/lotSize";
 import {
   TrendingUp,
   TrendingDown,
@@ -14,7 +16,8 @@ import {
   ArrowDownCircle,
   Target,
   ShieldAlert,
-  Loader2
+  Loader2,
+  Zap
 } from "lucide-react";
 import type { Position } from "@/lib/mt5/types";
 
@@ -24,6 +27,7 @@ export function TradePanel() {
   const { isConnected, accountInfo, positions, setPositions, isPlacingOrder, setPlacingOrder } = useMT5Store();
   const { symbol, bid, ask } = useMarketStore();
   const { addAlert } = useAlertStore();
+  const { activeSignal, entrySignals, setActiveSignal, settings } = useICTStore();
 
   const [orderType, setOrderType] = useState<OrderType>("buy");
   const [lotSize, setLotSize] = useState<string>("0.01");
@@ -32,6 +36,47 @@ export function TradePanel() {
 
   const currentPrice = orderType === "buy" ? ask : bid;
   const spread = ask - bid;
+
+  // Auto-fill from active signal
+  useEffect(() => {
+    if (activeSignal) {
+      // Set order type
+      setOrderType(activeSignal.direction === 'long' ? 'buy' : 'sell');
+
+      // Set SL and TP
+      setStopLoss(activeSignal.suggestedSL.toFixed(symbol === 'XAUUSD' ? 2 : 5));
+      setTakeProfit(activeSignal.suggestedTP1.toFixed(symbol === 'XAUUSD' ? 2 : 5));
+
+      // Calculate lot size based on risk
+      const balance = accountInfo?.balance || 10000;
+      const riskPercentage = settings.defaultRiskPercentage;
+
+      if (activeSignal.slDistancePips > 0) {
+        const calculation = calculateLotSize({
+          accountBalance: balance,
+          riskPercentage,
+          stopLossPips: activeSignal.slDistancePips,
+          symbol,
+        });
+        setLotSize(calculation.lotSize.toFixed(2));
+      }
+
+      // Show alert
+      addAlert({
+        type: "info",
+        title: "Signal Applied",
+        message: `${activeSignal.direction.toUpperCase()} - SL: ${activeSignal.slDistancePips.toFixed(1)} pips (${activeSignal.slSource})`,
+        priority: "medium",
+      });
+    }
+  }, [activeSignal, symbol, accountInfo?.balance, settings.defaultRiskPercentage, addAlert]);
+
+  // Handler to apply signal
+  const handleApplySignal = () => {
+    if (entrySignals.length > 0) {
+      setActiveSignal(entrySignals[0]);
+    }
+  };
 
   // Get pip size based on symbol
   const pipSize = symbol === "XAUUSD" ? 0.1 : 0.0001;
@@ -145,6 +190,47 @@ export function TradePanel() {
           Spread: <span className="font-mono text-foreground">{(spread / pipSize).toFixed(1)} pips</span>
         </span>
       </div>
+
+      {/* Apply Signal Button */}
+      {entrySignals.length > 0 && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleApplySignal}
+          className="w-full border-purple-500/30 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20"
+        >
+          <Zap className="h-4 w-4 mr-2" />
+          Apply Signal ({entrySignals[0].direction.toUpperCase()} - SL: {entrySignals[0].slDistancePips.toFixed(1)} pips)
+        </Button>
+      )}
+
+      {/* Active Signal Info */}
+      {activeSignal && (
+        <div className="p-2 rounded-lg bg-purple-500/10 border border-purple-500/30">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-purple-600 dark:text-purple-400 font-medium">
+              Signal Active
+            </span>
+            <Badge variant="outline" className="text-[10px] border-purple-500/50">
+              {activeSignal.slSource} / {activeSignal.tpSource}
+            </Badge>
+          </div>
+          <div className="grid grid-cols-3 gap-2 mt-2 text-xs font-mono">
+            <div>
+              <span className="text-muted-foreground">SL:</span>{" "}
+              <span className="text-red-500">{activeSignal.slDistancePips.toFixed(1)}p</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">TP:</span>{" "}
+              <span className="text-emerald-500">{activeSignal.suggestedTP1.toFixed(symbol === 'XAUUSD' ? 2 : 5)}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">R:R:</span>{" "}
+              <span className="text-purple-500">{activeSignal.riskRewardRatio.toFixed(1)}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Lot Size */}
       <div className="space-y-2">

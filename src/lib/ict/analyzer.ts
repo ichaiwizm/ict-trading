@@ -98,7 +98,11 @@ export function runICTAnalysis(
     const signal = generateEntrySignal(
       sweepShiftPattern,
       bestConfluence,
-      currentCandle.close
+      currentCandle.close,
+      swingPoints,    // For TP calculation based on swing points
+      orderBlocks,    // For SL calculation based on zone invalidation
+      symbol,         // For pip calculations
+      5               // Buffer pips (TODO: make configurable from settings)
     );
 
     entrySignals = [signal];

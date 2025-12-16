@@ -4,7 +4,11 @@ import type {
   EntrySignal,
   ConfluenceZone,
   EntryZone,
+  OrderBlock,
+  SLSource,
+  TPSource,
 } from '@/lib/ict/types';
+import { calculatePips, pipsToPrice } from '@/lib/calculations/lotSize';
 
 interface SweepShiftPattern {
   sweepIndex: number;
@@ -98,35 +102,159 @@ export function detectSweepAndShift(
 }
 
 /**
+ * Finds the previous swing point before a given index
+ */
+function findPreviousSwingPoint(
+  swingPoints: SwingPoint[],
+  beforeIndex: number,
+  type: 'high' | 'low'
+): SwingPoint | null {
+  const candidates = swingPoints
+    .filter(sp => sp.index < beforeIndex && sp.type === type)
+    .sort((a, b) => b.index - a.index); // Most recent first
+
+  return candidates[0] || null;
+}
+
+/**
+ * Gets the relevant order block bottom for bullish SL placement
+ */
+function getRelevantOrderBlockBottom(
+  orderBlocks: OrderBlock[],
+  currentPrice: number
+): number | null {
+  const validOBs = orderBlocks
+    .filter(ob => ob.type === 'bullish' && ob.status === 'valid')
+    .filter(ob => ob.top < currentPrice)
+    .sort((a, b) => b.bottom - a.bottom); // Closest to price first
+
+  return validOBs[0]?.bottom ?? null;
+}
+
+/**
+ * Gets the relevant order block top for bearish SL placement
+ */
+function getRelevantOrderBlockTop(
+  orderBlocks: OrderBlock[],
+  currentPrice: number
+): number | null {
+  const validOBs = orderBlocks
+    .filter(ob => ob.type === 'bearish' && ob.status === 'valid')
+    .filter(ob => ob.bottom > currentPrice)
+    .sort((a, b) => a.top - b.top); // Closest to price first
+
+  return validOBs[0]?.top ?? null;
+}
+
+/**
  * Generates entry signal from sweep/shift pattern and confluence zone
+ * Now with dynamic SL/TP based on zones and swing points
  */
 export function generateEntrySignal(
   pattern: SweepShiftPattern,
   confluenceZone: ConfluenceZone | undefined,
-  currentPrice: number
+  currentPrice: number,
+  swingPoints: SwingPoint[] = [],
+  orderBlocks: OrderBlock[] = [],
+  symbol: string = 'XAUUSD',
+  bufferPips: number = 5
 ): EntrySignal {
   const direction = pattern.direction === 'bullish' ? 'long' : 'short';
+  const buffer = pipsToPrice(bufferPips, symbol);
 
   let entryZone: EntryZone;
   let suggestedEntry: number;
   let stopLoss: number;
+  let slSource: SLSource;
+  let takeProfit1: number;
+  let takeProfit2: number | null;
+  let tpSource: TPSource;
 
+  // Entry zone from confluence or shift candle
   entryZone = confluenceZone
     ? { top: confluenceZone.overlapTop, bottom: confluenceZone.overlapBottom }
     : { top: pattern.shiftCandle.high, bottom: pattern.shiftCandle.low };
 
   if (direction === 'long') {
     suggestedEntry = confluenceZone ? confluenceZone.overlapBottom : pattern.shiftCandle.close;
-    stopLoss = pattern.sweepPrice - (pattern.sweepPrice * 0.001);
+
+    // SL: Zone invalidation + buffer (below zone for longs)
+    if (confluenceZone) {
+      stopLoss = confluenceZone.overlapBottom - buffer;
+      slSource = 'confluence_zone';
+    } else {
+      const obBottom = getRelevantOrderBlockBottom(orderBlocks, currentPrice);
+      if (obBottom !== null) {
+        stopLoss = obBottom - buffer;
+        slSource = 'order_block';
+      } else {
+        stopLoss = pattern.sweepPrice - buffer;
+        slSource = 'sweep_price';
+      }
+    }
+
+    // TP: Previous swing high
+    const previousSwingHigh = findPreviousSwingPoint(swingPoints, pattern.sweepIndex, 'high');
+    if (previousSwingHigh) {
+      takeProfit1 = previousSwingHigh.price;
+      tpSource = 'swing_point';
+    } else {
+      // Fallback to 2:1 ratio
+      const risk = Math.abs(suggestedEntry - stopLoss);
+      takeProfit1 = suggestedEntry + (risk * 2);
+      tpSource = 'fixed_ratio';
+    }
+
+    // TP2: Find next swing high after TP1
+    const nextSwingHigh = swingPoints
+      .filter(sp => sp.type === 'high' && sp.price > takeProfit1)
+      .sort((a, b) => a.price - b.price)[0];
+    takeProfit2 = nextSwingHigh?.price ?? null;
+
   } else {
     suggestedEntry = confluenceZone ? confluenceZone.overlapTop : pattern.shiftCandle.close;
-    stopLoss = pattern.sweepPrice + (pattern.sweepPrice * 0.001);
+
+    // SL: Zone invalidation + buffer (above zone for shorts)
+    if (confluenceZone) {
+      stopLoss = confluenceZone.overlapTop + buffer;
+      slSource = 'confluence_zone';
+    } else {
+      const obTop = getRelevantOrderBlockTop(orderBlocks, currentPrice);
+      if (obTop !== null) {
+        stopLoss = obTop + buffer;
+        slSource = 'order_block';
+      } else {
+        stopLoss = pattern.sweepPrice + buffer;
+        slSource = 'sweep_price';
+      }
+    }
+
+    // TP: Previous swing low
+    const previousSwingLow = findPreviousSwingPoint(swingPoints, pattern.sweepIndex, 'low');
+    if (previousSwingLow) {
+      takeProfit1 = previousSwingLow.price;
+      tpSource = 'swing_point';
+    } else {
+      // Fallback to 2:1 ratio
+      const risk = Math.abs(suggestedEntry - stopLoss);
+      takeProfit1 = suggestedEntry - (risk * 2);
+      tpSource = 'fixed_ratio';
+    }
+
+    // TP2: Find next swing low after TP1
+    const nextSwingLow = swingPoints
+      .filter(sp => sp.type === 'low' && sp.price < takeProfit1)
+      .sort((a, b) => b.price - a.price)[0];
+    takeProfit2 = nextSwingLow?.price ?? null;
   }
 
+  // Calculate SL distance in pips for lot sizing
+  const slDistancePips = calculatePips(suggestedEntry, stopLoss, symbol);
+
+  // Calculate actual risk-reward ratio
   const risk = Math.abs(suggestedEntry - stopLoss);
-  const multiplier = direction === 'long' ? 1 : -1;
-  const takeProfit1 = suggestedEntry + (risk * 2 * multiplier);
-  const takeProfit2 = suggestedEntry + (risk * 3 * multiplier);
+  const reward = Math.abs(takeProfit1 - suggestedEntry);
+  const riskRewardRatio = risk > 0 ? Number((reward / risk).toFixed(2)) : 2;
 
   let confidence = pattern.strength + (confluenceZone ? confluenceZone.strength * 0.5 : 0);
   confidence = Math.min(confidence, 100);
@@ -142,8 +270,11 @@ export function generateEntrySignal(
     suggestedSL: stopLoss,
     suggestedTP1: takeProfit1,
     suggestedTP2: takeProfit2,
-    riskRewardRatio: 2,
+    riskRewardRatio,
     confidence,
+    slSource,
+    tpSource,
+    slDistancePips,
   };
 }
 

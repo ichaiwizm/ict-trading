@@ -117,6 +117,9 @@ export interface EntryZone {
   bottom: number;
 }
 
+export type SLSource = 'confluence_zone' | 'order_block' | 'sweep_price';
+export type TPSource = 'swing_point' | 'fixed_ratio';
+
 export interface EntrySignal {
   id: string;
   type: EntrySignalType;
@@ -130,6 +133,10 @@ export interface EntrySignal {
   suggestedTP2: number | null;
   riskRewardRatio: number;
   confidence: number;
+  // New fields for dynamic SL/TP
+  slSource: SLSource;
+  tpSource: TPSource;
+  slDistancePips: number;
 }
 
 export interface ICTAnalysis {

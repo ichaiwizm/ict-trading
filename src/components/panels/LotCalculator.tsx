@@ -3,18 +3,23 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
 import { useMT5Store } from "@/stores/mt5Store";
 import { useMarketStore } from "@/stores/marketStore";
+import { useICTStore } from "@/stores/ictStore";
 import { calculateLotSize } from "@/lib/calculations/lotSize";
+import { Zap } from "lucide-react";
 
 export function LotCalculator() {
   const { accountInfo } = useMT5Store();
   const { symbol } = useMarketStore();
+  const { activeSignal } = useICTStore();
 
   const [accountBalance, setAccountBalance] = useState<number>(10000);
   const [riskPercentage, setRiskPercentage] = useState<number>(1);
   const [stopLossPips, setStopLossPips] = useState<number>(20);
   const [useManualBalance, setUseManualBalance] = useState<boolean>(true);
+  const [slFromSignal, setSlFromSignal] = useState<boolean>(false);
 
   // Update balance when account info is available (only if not using manual)
   useEffect(() => {
@@ -22,6 +27,14 @@ export function LotCalculator() {
       setAccountBalance(accountInfo.balance);
     }
   }, [accountInfo, useManualBalance]);
+
+  // Auto-update SL pips when active signal changes
+  useEffect(() => {
+    if (activeSignal?.slDistancePips && activeSignal.slDistancePips > 0) {
+      setStopLossPips(Math.round(activeSignal.slDistancePips * 10) / 10);
+      setSlFromSignal(true);
+    }
+  }, [activeSignal]);
 
   // Calculate lot size
   const calculation = calculateLotSize({
@@ -89,12 +102,23 @@ export function LotCalculator() {
 
       {/* Stop Loss Pips */}
       <div className="space-y-2">
-        <label className="text-xs text-muted-foreground">Stop Loss (pips)</label>
+        <div className="flex items-center justify-between">
+          <label className="text-xs text-muted-foreground">Stop Loss (pips)</label>
+          {slFromSignal && activeSignal && (
+            <Badge variant="outline" className="text-[10px] border-purple-500/50 text-purple-500 gap-1">
+              <Zap className="h-2.5 w-2.5" />
+              {activeSignal.slSource}
+            </Badge>
+          )}
+        </div>
         <Input
           type="number"
           value={stopLossPips}
-          onChange={(e) => setStopLossPips(Number(e.target.value))}
-          className="font-mono"
+          onChange={(e) => {
+            setStopLossPips(Number(e.target.value));
+            setSlFromSignal(false); // Reset when manually changed
+          }}
+          className={`font-mono ${slFromSignal ? 'border-purple-500/50' : ''}`}
           min={1}
         />
       </div>
