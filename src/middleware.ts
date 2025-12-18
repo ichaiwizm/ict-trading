@@ -1,47 +1,61 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+// Routes that don't require authentication
+const publicRoutes = ['/login', '/api/auth/login']
+
 export function middleware(request: NextRequest) {
-  // Skip auth for static files and API health checks if needed
   const { pathname } = request.nextUrl
 
   // Allow public assets
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
-    pathname.includes('.')
+    pathname.includes('.') ||
+    publicRoutes.some(route => pathname.startsWith(route))
   ) {
     return NextResponse.next()
   }
 
-  // Get the authorization header
-  const authHeader = request.headers.get('authorization')
+  // Check for auth token in cookie
+  const authToken = request.cookies.get('auth-token')?.value
 
-  // Check if we have valid credentials
-  if (authHeader) {
-    const [scheme, encoded] = authHeader.split(' ')
-
-    if (scheme === 'Basic' && encoded) {
-      const decoded = atob(encoded)
-      const [username, password] = decoded.split(':')
-
-      // Check credentials against environment variables
-      const validUsername = process.env.AUTH_USERNAME || 'admin'
-      const validPassword = process.env.AUTH_PASSWORD
-
-      if (validPassword && username === validUsername && password === validPassword) {
-        return NextResponse.next()
-      }
-    }
+  // If no auth token, redirect to login page
+  if (!authToken) {
+    const loginUrl = new URL('/login', request.url)
+    // Add redirect parameter to return to original page after login
+    loginUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(loginUrl)
   }
 
-  // If no valid auth, request credentials
-  return new NextResponse('Authentication required', {
-    status: 401,
-    headers: {
-      'WWW-Authenticate': 'Basic realm="ICT Trading - Enter credentials"',
-    },
-  })
+  // Validate the token (basic validation - decode and check format)
+  try {
+    const decoded = atob(authToken)
+    const [username, timestamp] = decoded.split(':')
+
+    // Check if token has valid format
+    if (!username || !timestamp) {
+      throw new Error('Invalid token format')
+    }
+
+    // Check token expiry (7 days)
+    const tokenAge = Date.now() - parseInt(timestamp)
+    const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 days in ms
+
+    if (tokenAge > maxAge) {
+      // Token expired, redirect to login
+      const response = NextResponse.redirect(new URL('/login', request.url))
+      response.cookies.delete('auth-token')
+      return response
+    }
+
+    return NextResponse.next()
+  } catch {
+    // Invalid token, redirect to login
+    const response = NextResponse.redirect(new URL('/login', request.url))
+    response.cookies.delete('auth-token')
+    return response
+  }
 }
 
 export const config = {

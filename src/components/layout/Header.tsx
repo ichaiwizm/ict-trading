@@ -1,12 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMarketStore } from '@/stores';
-import { Activity, Wifi, WifiOff, Zap } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
+import { Activity, Wifi, WifiOff, Zap, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { Button } from '@/components/ui/button';
 
 export function Header() {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [isKillZoneActive, setIsKillZoneActive] = useState(false);
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
@@ -15,10 +19,23 @@ export function Header() {
 
   // Access store only after mount to prevent hydration mismatch
   const storeData = useMarketStore();
+  const { logout, user } = useAuthStore();
   const symbol = mounted ? storeData.symbol : 'EURUSD';
   const bid = mounted ? storeData.bid : 0;
   const ask = mounted ? storeData.ask : 0;
   const connectionStatus = mounted ? storeData.connectionStatus : null;
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      logout();
+      router.push('/login');
+    } catch {
+      // Even if API fails, clear local state and redirect
+      logout();
+      router.push('/login');
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -225,6 +242,19 @@ export function Header() {
 
           {/* Theme Toggle */}
           <ThemeToggle />
+
+          {/* Logout Button */}
+          {mounted && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleLogout}
+              className="text-muted-foreground hover:text-foreground"
+              title={user ? `Déconnexion (${user})` : 'Déconnexion'}
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          )}
 
           {/* UTC Time */}
           <div className="hidden xl:flex items-center rounded-lg border border-border bg-card/50 px-3 py-2">
