@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { MT5Provider } from "@/components/providers/MT5Provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -30,7 +31,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          {children}
+          <MT5Provider>
+            {children}
+          </MT5Provider>
           <Toaster position="top-right" richColors />
         </ThemeProvider>
       </body>
